@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<componentPackage>
+  <component uri="http://stade.se/2010/flash/query" name="FlashQuery" class="se.stade.flash.dom.query.FlashQuery"/>
+</componentPackage>

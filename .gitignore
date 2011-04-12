@@ -1,0 +1,11 @@
+.settings
+.actionScriptProperties
+.flexLibProperties
+.FlexUnitSettings
+.project
+.DS_Store
+bin/
+.redo
+.do_built
+.do_built.dir
+.fxpProperties
