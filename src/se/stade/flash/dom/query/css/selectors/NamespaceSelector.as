@@ -21,7 +21,7 @@ package se.stade.flash.dom.query.css.selectors
 			if (ns == "*")
 				return true;
 			
-			return Reflect.types.inPackage(ns).on(element) == true;
+			return Reflect.first.type.inPackage(ns).on(element);
 		}
 		
 		public function toString():String

@@ -19,10 +19,10 @@ package se.stade.flash.dom.query.css.selectors
 
         public function matches(element:DisplayObject):Boolean
         {
-            var hasMatchingType:Boolean = Reflect.types
+            var hasMatchingType:Boolean = Reflect.first
+                                                 .type
                                                  .like(type)
-                                                 .on(element)
-                                                 .length > 0;
+                                                 .on(element);
             return hasMatchingType
                    && namespace.matches(element);
         }
