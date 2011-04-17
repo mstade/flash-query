@@ -5,9 +5,14 @@ package se.stade.flash.dom.query
 	import flash.utils.Dictionary;
 	
 	import se.stade.colligo.*;
+	import se.stade.daffodil.Reflect;
+	import se.stade.daffodil.qualify;
+	import se.stade.daffodil.types.QualifiedType;
 	import se.stade.flash.dom.*;
 	import se.stade.flash.dom.events.*;
 	import se.stade.flash.dom.query.css.parsing.*;
+	import se.stade.flash.dom.query.css.selectors.ElementSelector;
+	import se.stade.flash.dom.query.css.selectors.NamespaceSelector;
 	import se.stade.flash.dom.traversals.*;
 	import se.stade.stilts.Disposable;
 	
@@ -262,6 +267,27 @@ package se.stade.flash.dom.query
 		{
             return depthfirst::execute(query, children().elements, limit);
 		}
+        
+        public function type(query:Class, limit:Number = Number.MAX_VALUE):FlashQuery
+        {
+            var type:QualifiedType = Reflect.first.type.on(query);
+            
+            var namespace:NamespaceSelector = new NamespaceSelector(type.packageName);
+            var selector:ElementSelector = new ElementSelector(type.name, namespace);
+            
+            var matches:Array = [];
+            var traverser:DepthFirstTraversal = new DepthFirstTraversal(elements);
+            
+            while (traverser.hasNext && matches.length < limit)
+            {
+                var element:DisplayObject = traverser.getNext();
+                
+                if (selector.matches(element))
+                    matches.push(element);
+            }
+            
+            return fromElements(matches, type.qualifiedName);
+        }
 		
 		public function filter(query:String, limit:Number = Number.MAX_VALUE):FlashQuery
 		{
