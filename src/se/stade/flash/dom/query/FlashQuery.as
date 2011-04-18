@@ -37,7 +37,7 @@ package se.stade.flash.dom.query
 			_parser = parser || new SelectorParser(new SelectorLexer());
 		}
         
-        private function fromElements(elements:Array, query:String):FlashQuery
+        private function fromElements(elements:Array, query:*):FlashQuery
         {
             var wrapped:FlashQuery = new FlashQuery(Vector.<DisplayObject>(elements), parser);
             wrapped._context = this;
@@ -46,23 +46,42 @@ package se.stade.flash.dom.query
             return wrapped;
         }
         
-        private function execute(query:String, traverser:DisplayListTraversal, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):FlashQuery
+        private var executor:QueryExecutor = new QueryExecutor;
+        
+        private function execute(query:String, traversal:DisplayListTraversal, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):FlashQuery
         {
-            var executor:QueryExecutor = new QueryExecutor(parser, traverser);
-            return fromElements(executor.process(query, limit, breakOnUnmatched).matches, query);
+            var selector:DisplayObjectMatcher = parser.interpret(query);
+            return fromElements(executor.match(selector, traversal, limit, breakOnUnmatched).matches, query);   
         }
         
-        private namespace depthfirst;
+        private namespace stringbased;
         
-        depthfirst function execute(query:String, elements:*, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):FlashQuery
+        stringbased function execute(query:String, elements:*, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):FlashQuery
+        {
+            if (elements is DisplayObject)
+                elements = new <DisplayObject>[elements];
+
+            var traversal:DisplayListTraversal = new DepthFirstTraversal(elements);
+            return execute(query, traversal, limit, breakOnUnmatched);
+        }
+        
+        private namespace typesafe;
+        
+        typesafe function execute(query:Class, elements:*, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):FlashQuery
         {
             if (elements is DisplayObject)
                 elements = new <DisplayObject>[elements];
             
-            return execute(query, new DepthFirstTraversal(elements), limit, breakOnUnmatched);
+            var traverser:DisplayListTraversal = new DepthFirstTraversal(elements);
+            
+            var type:QualifiedType = Reflect.first.type.on(query);
+            var namespace:NamespaceSelector = new NamespaceSelector(type.packageName);
+            var selector:ElementSelector = new ElementSelector(type.name, namespace);
+            
+            return fromElements(executor.match(selector, traverser, limit, breakOnUnmatched).matches, query);
         }
         
-        private var query:String = "";
+        private var query:* = "";
 		
 		private var _context:FlashQuery;
 		
@@ -136,7 +155,8 @@ package se.stade.flash.dom.query
         
         protected function handleAddedElement(added:Event):void
         {
-            var result:FlashQuery = depthfirst::execute(query, added.target);
+            var search:Namespace = query is Class ? typesafe : stringbased;
+            var result:FlashQuery = search::execute(query, added.target);
             
             result.set(liveProperties);
             
@@ -150,7 +170,8 @@ package se.stade.flash.dom.query
         
         protected function handleRemovedElement(removed:Event):void
         {
-            var result:FlashQuery = depthfirst::execute(query, removed.target);
+            var search:Namespace = query is Class ? typesafe : stringbased;
+            var result:FlashQuery = search::execute(query, removed.target);
             
             for each (var event:EventListenerParameters in events.getListeners())
             {
@@ -265,28 +286,12 @@ package se.stade.flash.dom.query
 		 */
 		public function find(query:String, limit:Number = Number.MAX_VALUE):FlashQuery
 		{
-            return depthfirst::execute(query, children().elements, limit);
+            return stringbased::execute(query, children().elements, limit);
 		}
         
         public function type(query:Class, limit:Number = Number.MAX_VALUE):FlashQuery
         {
-            var type:QualifiedType = Reflect.first.type.on(query);
-            
-            var namespace:NamespaceSelector = new NamespaceSelector(type.packageName);
-            var selector:ElementSelector = new ElementSelector(type.name, namespace);
-            
-            var matches:Array = [];
-            var traverser:DepthFirstTraversal = new DepthFirstTraversal(elements);
-            
-            while (traverser.hasNext && matches.length < limit)
-            {
-                var element:DisplayObject = traverser.getNext();
-                
-                if (selector.matches(element))
-                    matches.push(element);
-            }
-            
-            return fromElements(matches, type.qualifiedName);
+            return typesafe::execute(query, children().elements, limit);
         }
 		
 		public function filter(query:String, limit:Number = Number.MAX_VALUE):FlashQuery
@@ -335,7 +340,7 @@ package se.stade.flash.dom.query
 			
 			for each (var root:DisplayObjectContainer in roots)
 			{
-				if (depthfirst::execute(query, root, limit).count > 0)
+				if (stringbased::execute(query, root, limit).count > 0)
 					hasMatchingChildren.push(root);
 				
 				if (limit < hasMatchingChildren.length)
@@ -372,8 +377,9 @@ package se.stade.flash.dom.query
 		
 		public function not(query:String, limit:Number = Number.MAX_VALUE):FlashQuery
 		{
-            var executor:QueryExecutor = new QueryExecutor(parser, new LinearTraversal(elements));
-            return fromElements(executor.process(query, limit, false).unmatched, query);
+            var selector:DisplayObjectMatcher = parser.interpret(query);
+            var traversal:DisplayListTraversal = new LinearTraversal(elements)
+            return fromElements(executor.match(selector, traversal, limit, false).unmatched, query);
 		}
 		
 		public function slice(start:int, end:int):FlashQuery

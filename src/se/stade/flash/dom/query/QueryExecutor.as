@@ -2,25 +2,15 @@ package se.stade.flash.dom.query
 {
     import flash.display.DisplayObject;
     
+    import se.stade.flash.dom.Element;
     import se.stade.flash.dom.query.css.selectors.InvalidSelector;
     import se.stade.flash.dom.traversals.DisplayListTraversal;
 
     public class QueryExecutor
     {
-        public function QueryExecutor(parser:QueryParser, traverser:DisplayListTraversal)
+        public function match(selector:DisplayObjectMatcher, traverser:DisplayListTraversal, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):QueryResult
         {
-            this.parser = parser;
-            this.traverser = traverser;
-        }
-        
-        private var parser:QueryParser;
-        private var traverser:DisplayListTraversal;
-        
-        public function process(query:String, limit:Number = Number.MAX_VALUE, breakOnUnmatched:Boolean = false):QueryResult
-        {
-            var selector:DisplayObjectMatcher = parser.interpret(query);
-            
-            if (!query || selector is InvalidSelector)
+            if (selector is InvalidSelector)
                 return new QueryResult();
             
             var matches:Array = [];
