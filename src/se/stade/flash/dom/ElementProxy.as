@@ -2,6 +2,7 @@ package se.stade.flash.dom
 {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.IEventDispatcher;
 	import flash.utils.flash_proxy;
 	
 	import se.stade.colligo.Processable;
@@ -20,7 +21,7 @@ package se.stade.flash.dom
 	 * 
 	 * @author Marcus Stade
 	 */
-	public dynamic class ElementProxy extends ItemProxy implements Processable, Element
+	public dynamic class ElementProxy extends ItemProxy implements Processable, Element, IEventDispatcher
 	{
 		/**
 		 * Wraps the given elements in a proxy instance with a given context.
@@ -84,7 +85,7 @@ package se.stade.flash.dom
 		{
 			var events:Array = type.replace(/\s+/g, " ").split(" ");
 			
-			for each (var event:String in events)
+			for each (type in events)
 			{
 				for each (var element:DisplayObject in list)
 				{
@@ -92,6 +93,29 @@ package se.stade.flash.dom
 				}
 			}
 		}
+        
+        public function hasEventListener(type:String):Boolean
+        {
+            for each (var element:DisplayObject in elements)
+            {
+                if (element.hasEventListener(type))
+                    return true;
+            }
+            
+            return false;
+        }
+
+        public function willTrigger(type:String):Boolean
+        {
+            for each (var element:DisplayObject in elements)
+            {
+                if (element.willTrigger(type))
+                    return true;
+            }
+            
+            return false;
+        }
+
 		
 		/**
 		 * Dispatches an event from each of the proxied elements.
