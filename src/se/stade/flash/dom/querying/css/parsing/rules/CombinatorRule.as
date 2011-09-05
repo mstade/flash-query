@@ -6,7 +6,7 @@ package se.stade.flash.dom.querying.css.parsing.rules
 	import se.stade.flash.dom.querying.css.parsing.SelectorToken;
 	import se.stade.flash.dom.querying.css.selectors.combinators.ChildSelector;
 	import se.stade.flash.dom.querying.css.selectors.combinators.DescendantSelector;
-	import se.stade.flash.dom.querying.css.selectors.GroupSelector;
+	import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
 	import se.stade.flash.dom.querying.css.selectors.combinators.SiblingSelector;
 	import se.stade.parsing.Expression;
 	import se.stade.parsing.Token;
@@ -20,7 +20,7 @@ package se.stade.flash.dom.querying.css.parsing.rules
         public function CombinatorRule()
         {
             factories = new Dictionary;
-            factories[SelectorToken.Group]      = GroupSelector;
+            factories[SelectorToken.Group]      = SelectorGroup;
             factories[SelectorToken.Child]      = ChildSelector;
             factories[SelectorToken.Sibling]    = SiblingSelector;
             factories[SelectorToken.Whitespace] = DescendantSelector;

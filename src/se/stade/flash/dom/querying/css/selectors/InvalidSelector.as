@@ -21,7 +21,7 @@ package se.stade.flash.dom.querying.css.selectors
 		
 		public function toString():String
 		{
-			return "{{" + token + "}}";
+			return "<<INVALID: " + token + ">>";
 		}
 	}
 }

@@ -25,7 +25,7 @@ package se.stade.flash.dom.querying.css.parsing
                 nonascii:   "[^\\0-\\177]",
                 w:          "[ \\t\\r\\n\\f]",
                 nl:         "\\n|\\r\\n|\\r|\\f",
-                num:        "[0-9]+|[0-9]*\.[0-9]+",
+                num:        "[0-9]+|[0-9]*\\.[0-9]+",
                 unicode:    "[0-9a-f]{1,6}(?:{nl}|{w})?",
                 escape:     "{unicode}|[^\\n\\r\\f0-9a-f]",
                 string1:    '"([^\\n\\r\\f\"]|{nl}|{nonascii}|{escape})*"',
@@ -54,8 +54,6 @@ package se.stade.flash.dom.querying.css.parsing
             tokens[SelectorToken.Dimension]      = "{num}{name}";
             tokens[SelectorToken.Percentage]     = "{num}%";
             
-            tokens[SelectorToken.Not]            = ":not\\(";
-            tokens[SelectorToken.Has]            = ":has\\(";
             tokens[SelectorToken.Function]       = ":{ident}\\(";
             tokens[SelectorToken.FunctionEnd]    = "\\)";
             tokens[SelectorToken.PseudoClass]    = ":{ident}";
@@ -67,22 +65,6 @@ package se.stade.flash.dom.querying.css.parsing
                 var lexeme:Lexeme = lexemeFactory.create(type, tokens[type]);
                 setLexeme(type, lexeme);
             }
-        }
-        
-        private function setToken(type:String, pattern:String):void
-        {
-            var lexeme:Lexeme = lexemeFactory.create(type, pattern);
-            setLexeme(type, lexeme);
-        }
-        
-        public function setPseudoClass(name:String):void
-        {
-            setToken(SelectorToken.PseudoClass, ":" + name);
-        }
-        
-        public function setPseudoFunction(name:String):void
-        {
-            setToken(SelectorToken.Function, ":" + name + "\\(");
         }
     }
 }

@@ -11,19 +11,25 @@ package se.stade.flash.dom.querying.css.parsing.rules
 	
 	public class PseudoFunctionRule implements PrefixRule
 	{
-        public function PseudoFunctionRule(parameterParser:PrefixRule)
+        public function PseudoFunctionRule(SelectoryType:Class)
         {
-            this.parameterParser = parameterParser;
+            this.SelectorType = SelectoryType;
         }
         
-        private var parameterParser:PrefixRule;
+        private var SelectorType:Class;
         
         public function evaluate(current:Token, following:TokenStream, parser:Parser, priority:uint):Expression
         {
-            var expression:Expression = parameterParser.evaluate(current, following, parser, priority);
+            var input:String = "";
+            
+            while (following.acceptAnythingBut(SelectorToken.FunctionEnd))
+            {
+                input += following.current.value;
+            }
+            
             following.expect(SelectorToken.FunctionEnd);
             
-            return expression;
+            return new SelectorType(input);
         }
 	}
 }

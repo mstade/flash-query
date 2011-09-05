@@ -29,10 +29,6 @@ package se.stade.flash.dom.querying.css.parsing
         public static const FunctionEnd:String      = "functionEnd";
         
         // Pseudo selector tokens
-        public static const Not:String              = ":not";
-        public static const Has:String              = ":has";
-        public static const Extends:String          = ":extd";
-        public static const Implements:String       = ":impl";
-        public static const PseudoClass:String      = ":class";
+        public static const PseudoClass:String      = "psuedoClass";
     }
 }

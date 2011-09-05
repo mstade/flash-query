@@ -9,27 +9,27 @@ package se.stade.flash.dom.querying.css.selectors.type
 
     internal class ElementSelectorBase implements ElementMatcher, Expression
     {
-        public function ElementSelectorBase(selector:String, name:String, namespace:ElementMatcher = null)
+        public function ElementSelectorBase(selector:String, type:String, namespace:ElementMatcher = null)
         {
-            this.name = name || "*";
+            this.type = type || "*";
             this.namespace = namespace || NamespaceSelector.Any;
             
             this.selector = format(selector || "{type}", {
-                type: (namespace && name) ? namespace + name  :
+                type: (namespace && type) ? namespace + type  :
                               (namespace) ? String(namespace) :
-                                   (name) ? name : "*"
+                                   (type) ? type : "*"
             });
         }
         
         private var selector:String;
         
-        protected var name:String;
+        protected var type:String;
         protected var reflection:TypeReflection;
         protected var namespace:ElementMatcher;
         
         public final function matches(element:DisplayObject):Boolean
         {
-            return namespace.matches(element) && reflection.on(element);
+            return namespace.matches(element) && (type == "*" || reflection.on(element));
         }
         
         public final function toString():String

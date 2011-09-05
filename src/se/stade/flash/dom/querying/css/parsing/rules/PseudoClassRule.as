@@ -1,5 +1,7 @@
 package se.stade.flash.dom.querying.css.parsing.rules
 {
+    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.classes.states.PositiveStateSelector;
     import se.stade.parsing.Expression;
     import se.stade.parsing.Token;
     import se.stade.parsing.TokenStream;
@@ -8,16 +10,17 @@ package se.stade.flash.dom.querying.css.parsing.rules
     
     public class PseudoClassRule implements PrefixRule
     {
-        public function PseudoClassRule(SelectorType:Class)
+        public function PseudoClassRule(factory:Function)
         {
-            this.SelectorType = SelectorType;
+            create = factory;
         }
         
-        private var SelectorType:Class;
+        private var create:Function;
         
         public function evaluate(current:Token, following:TokenStream, parser:Parser, priority:uint):Expression
         {
-            return new SelectorType();
+            var name:String = current.value.slice(1);
+            return create(name);
         }
     }
 }

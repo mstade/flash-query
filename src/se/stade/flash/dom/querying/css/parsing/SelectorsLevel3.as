@@ -1,13 +1,13 @@
 package se.stade.flash.dom.querying.css.parsing
 {
     import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.flash.dom.querying.css.selectors.GroupSelector;
+    import se.stade.flash.dom.querying.css.parsing.rules.PseudoRuleCollection;
+    import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
     import se.stade.parsing.Expression;
     import se.stade.parsing.Language;
     import se.stade.parsing.TokenStream;
     import se.stade.parsing.pratt.ExpressionParser;
     import se.stade.parsing.pratt.Parser;
-    import se.stade.parsing.pratt.PrefixRule;
     import se.stade.stilts.string.trim;
     
     public final class SelectorsLevel3 implements Language
@@ -39,24 +39,19 @@ package se.stade.flash.dom.querying.css.parsing
             }
             
             if (selectors.length > 1)
-                return new GroupSelector(selectors);
+                return new SelectorGroup(selectors);
             else
                 return Expression(selectors[0]);
         }
         
-        public function setPseudoClass(name:String, SelectorType:Class):void
+        public function get pseudoClasses():PseudoRuleCollection 
         {
-            grammar.simpleSelector.setPseudoClass(name, SelectorType);
+            return grammar.simpleSelector.pseudoClasses;
         }
         
-        public function setPseudoFunction(name:String, SelectorType:Class):void
+        public function get pseudoFunctions():PseudoRuleCollection
         {
-            grammar.simpleSelector.setPseudoFunction(name, SelectorType);
-        }
-        
-        public function setPseudoExpression(name:String, parameterParser:PrefixRule):void
-        {
-            grammar.simpleSelector.setPseudoExpression(name, parameterParser);
+            return grammar.simpleSelector.pseudoFunctions;
         }
     }
 }

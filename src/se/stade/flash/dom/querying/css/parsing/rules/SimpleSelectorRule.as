@@ -2,14 +2,18 @@ package se.stade.flash.dom.querying.css.parsing.rules
 {
     import flash.utils.Dictionary;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
     import se.stade.flash.dom.querying.css.parsing.SelectorToken;
-    import se.stade.flash.dom.querying.css.selectors.SelectorSequence;
-    import se.stade.flash.dom.querying.css.selectors.pseudo.HasSelector;
-    import se.stade.flash.dom.querying.css.selectors.pseudo.NotSelector;
+    import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.classes.states.NegativeStateSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.classes.states.PositiveStateSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.classes.structural.ElementIndexSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.classes.structural.EmptySelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.NotSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.states.CurrentStateSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.structural.HasSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.types.ExtendsSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.types.ImplementsSelector;
     import se.stade.flash.dom.querying.css.selectors.type.ElementSelector;
-    import se.stade.flash.dom.querying.css.selectors.type.ExtendsSelector;
-    import se.stade.flash.dom.querying.css.selectors.type.ImplementsSelector;
     import se.stade.parsing.Expression;
     import se.stade.parsing.Token;
     import se.stade.parsing.TokenStream;
@@ -30,38 +34,61 @@ package se.stade.flash.dom.querying.css.parsing.rules
             rules[SelectorToken.Class]          = new ClassRule;
             rules[SelectorToken.AttributeStart] = new AttributeRule;
             
-            // Psuedo
-            setPseudoFunction(SelectorToken.Not,        NotSelector);
-            setPseudoFunction(SelectorToken.Has,        HasSelector);
-            setPseudoFunction(SelectorToken.Extends,    ExtendsSelector);
-            setPseudoFunction(SelectorToken.Implements, ImplementsSelector); 
+            // Psuedo classes
+            pseudoClasses.setMatcher(EmptySelector.Name, new EmptySelector);
+            
+            pseudoClasses.setMatcher(ElementIndexSelector.FirstChild, new ElementIndexSelector(ElementIndexSelector.FirstChild, 0));
+            pseudoClasses.setMatcher(ElementIndexSelector.LastChild,  new ElementIndexSelector(ElementIndexSelector.LastChild, -1));
+            
+            pseudoClasses.setMatcher("enabled",  new PositiveStateSelector("enabled"));
+            pseudoClasses.setMatcher("selected", new PositiveStateSelector("selected"));
+            pseudoClasses.setMatcher("checked",  SelectorGroup.Named(":checked",
+                new PositiveStateSelector("selected"),
+                new PositiveStateSelector("checked")
+            ));
+            
+            pseudoClasses.setMatcher("disabled", SelectorGroup.Named(":disabled",
+                    new NegativeStateSelector("enabled"),
+                    new PositiveStateSelector("disabled")
+            ));
+            
+            // Pseudo functions
+            pseudoFunctions.setParser(NotSelector.Name,          new PseudoSelectorRule(NotSelector));
+            pseudoFunctions.setParser(HasSelector.Name,          new PseudoSelectorRule(HasSelector));
+            pseudoFunctions.setParser(ExtendsSelector.Name,      new PseudoFunctionRule(ExtendsSelector));
+            pseudoFunctions.setParser(ImplementsSelector.Name,   new PseudoFunctionRule(ImplementsSelector));
+            pseudoFunctions.setParser(CurrentStateSelector.Name, new PseudoFunctionRule(CurrentStateSelector));
         }
         
         private var rules:Dictionary;
         
-        public function setPseudoClass(name:String, SelectorType:Class):void
+        private var _pseudoClasses:PseudoRuleCollection = new PseudoClassCollection;
+        public function get pseudoClasses():PseudoRuleCollection 
         {
-            name = name.replace(/:/g, "");
-            rules[":" + name] = new PseudoClassRule(SelectorType);
+            return _pseudoClasses;
         }
         
-        public function setPseudoFunction(name:String, SelectorType:Class):void
+        private var _pseudoFunctions:PseudoRuleCollection = new PseudoFunctionCollection;
+        public function get pseudoFunctions():PseudoRuleCollection 
         {
-            setPseudoExpression(name, new QueryRule(SelectorType));
+            return _pseudoFunctions;
         }
         
-        public function setPseudoExpression(name:String, parameterParser:PrefixRule):void
+        
+        private function getPseudoClassFactory(Type:Class):Function
         {
-            name = name.replace(/:/g, "").replace(/\(|\)/g, "");
-            rules[":" + name + "("] = new PseudoFunctionRule(parameterParser); 
+            return function(name:String):Expression
+            {
+                return new Type(name);
+            }
         }
         
-        public function evaluate(current:Token, following:TokenStream, parser:Parser, priority:uint):Expression
+        public function evaluate(current:Token, following:TokenStream, parser:Parser, precedence:uint):Expression
         {
-            var selectors:Vector.<ElementMatcher> = new <ElementMatcher>[];
+            var selectors:Array = [];
             
             var rule:PrefixRule = getRule(current);
-            selectors.push(rule.evaluate(current, following, parser, priority));
+            selectors.push(rule.evaluate(current, following, parser, precedence));
             
             while (following.accept(SelectorToken.Id,
                                     SelectorToken.Class,
@@ -70,17 +97,21 @@ package se.stade.flash.dom.querying.css.parsing.rules
                                     SelectorToken.Function))
             {
                 rule = getRule(following.current);
-                selectors.push(rule.evaluate(following.current, following, parser, priority));
+                selectors.push(rule.evaluate(following.current, following, parser, precedence));
             }
             
-            return selectors.length > 1 ? new SelectorSequence(selectors) : Expression(selectors[0]);
+            return selectors.length > 1 ? SelectorGroup.Sequence.apply(null, selectors) : Expression(selectors[0]);
         }
         
         private function getRule(current:Token):PrefixRule
         {
-            if (current.type in rules)
+            if (current.type == SelectorToken.PseudoClass)
+                return pseudoClasses;
+            else if (current.type == SelectorToken.Function)
+                return pseudoFunctions;
+            else if (current.type in rules)
                 return rules[current.type];
-            if (current.value in rules)
+            else if (current.value in rules)
                 return rules[current.value];
 
             return null;

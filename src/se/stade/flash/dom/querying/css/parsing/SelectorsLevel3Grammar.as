@@ -7,13 +7,13 @@ package se.stade.flash.dom.querying.css.parsing
     import se.stade.flash.dom.querying.css.parsing.rules.IdentityRule;
     import se.stade.flash.dom.querying.css.parsing.rules.PseudoClassRule;
     import se.stade.flash.dom.querying.css.parsing.rules.PseudoFunctionRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.QueryRule;
+    import se.stade.flash.dom.querying.css.parsing.rules.PseudoSelectorRule;
     import se.stade.flash.dom.querying.css.parsing.rules.SimpleSelectorRule;
-    import se.stade.flash.dom.querying.css.selectors.pseudo.HasSelector;
-    import se.stade.flash.dom.querying.css.selectors.pseudo.NotSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.structural.HasSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.NotSelector;
     import se.stade.flash.dom.querying.css.selectors.type.ElementSelector;
-    import se.stade.flash.dom.querying.css.selectors.type.ExtendsSelector;
-    import se.stade.flash.dom.querying.css.selectors.type.ImplementsSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.types.ExtendsSelector;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.types.ImplementsSelector;
     import se.stade.parsing.pratt.ExpressionGrammar;
     import se.stade.parsing.pratt.PrefixRule;
 
@@ -38,10 +38,8 @@ package se.stade.flash.dom.querying.css.parsing
             setPrefixFor(SelectorToken.AttributeStart, simpleSelector);
             
             // Pseudo
-            setPrefixFor(SelectorToken.Not,            simpleSelector);
-            setPrefixFor(SelectorToken.Has,            simpleSelector);
-            setPrefixFor(SelectorToken.Extends,        simpleSelector);
-            setPrefixFor(SelectorToken.Implements,     simpleSelector);
+            setPrefixFor(SelectorToken.Function,       simpleSelector);
+            setPrefixFor(SelectorToken.PseudoClass,    simpleSelector);
             
             // Combinators
             var combinator:CombinatorRule = new CombinatorRule;

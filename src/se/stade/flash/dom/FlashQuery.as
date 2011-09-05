@@ -13,7 +13,7 @@ package se.stade.flash.dom
 	import se.stade.flash.dom.querying.QueryLimit;
 	import se.stade.flash.dom.querying.QueryResult;
 	import se.stade.flash.dom.querying.css.parsing.*;
-	import se.stade.flash.dom.querying.css.selectors.GroupSelector;
+	import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
 	import se.stade.flash.dom.querying.css.selectors.InvalidSelector;
 	import se.stade.flash.dom.querying.css.selectors.type.ElementSelector;
 	import se.stade.flash.dom.querying.css.selectors.type.ElementTypeSelector;
@@ -208,7 +208,7 @@ package se.stade.flash.dom
             result._contextcontext = this;
             
             var selectors:Vector.<ElementMatcher> = new <ElementMatcher>[query.selector, other.query.selector];
-            result.query = new DisplayQuery(new GroupSelector(selectors));
+            result.query = new DisplayQuery(new SelectorGroup(selectors));
             
             return result;
 		}
