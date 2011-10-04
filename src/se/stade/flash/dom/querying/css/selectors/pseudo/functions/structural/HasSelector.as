@@ -1,11 +1,11 @@
 package se.stade.flash.dom.querying.css.selectors.pseudo.functions.structural
 {
-	import flash.display.DisplayObject;
-	import flash.display.DisplayObjectContainer;
-	
-	import se.stade.flash.dom.querying.ElementMatcher;
-	import se.stade.parsing.Expression;
-	import se.stade.flash.dom.querying.css.selectors.pseudo.functions.PseudoFunctionBase;
+    import flash.display.DisplayObject;
+    import flash.display.DisplayObjectContainer;
+    
+    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.pseudo.functions.PseudoFunctionBase;
     
     public class HasSelector extends PseudoFunctionBase implements ElementMatcher, Expression
     {

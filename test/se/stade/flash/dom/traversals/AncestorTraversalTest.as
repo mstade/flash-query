@@ -13,7 +13,7 @@ package se.stade.flash.dom.traversals
     import spark.components.Group;
     
     public class AncestorTraversalTest extends TraversalTest
-    {		
+    {       
         private var traverser:Ancestors;
         
         [Before]

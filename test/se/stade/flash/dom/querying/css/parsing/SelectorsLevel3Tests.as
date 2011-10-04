@@ -12,7 +12,7 @@ package se.stade.flash.dom.querying.css.parsing
     Parameterized;
     [RunWith("org.flexunit.runners.Parameterized")]
     public class SelectorsLevel3Tests
-    {		
+    {       
         private var css:Language;
         
         [Before]

@@ -11,7 +11,7 @@ package se.stade.flash.dom.traversals
     import spark.components.Scroller;
     
     public class FollowingSiblingTraversalTest extends TraversalTest
-    {		
+    {       
         private var traverser:FollowingSiblings;
         
         [Before]

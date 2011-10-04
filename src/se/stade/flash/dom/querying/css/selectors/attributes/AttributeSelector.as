@@ -1,24 +1,24 @@
 package se.stade.flash.dom.querying.css.selectors.attributes
 {
-	import avmplus.getQualifiedClassName;
-	
-	import flash.display.DisplayObject;
-	import flash.system.ApplicationDomain;
-	import flash.utils.getDefinitionByName;
-	
-	import se.stade.babbla.formatting.format;
-	import se.stade.flash.dom.querying.ElementMatcher;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AnyAttribute;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeOperator;
-	import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
-	import se.stade.parsing.Expression;
+    import avmplus.getQualifiedClassName;
+    
+    import flash.display.DisplayObject;
+    import flash.system.ApplicationDomain;
+    import flash.utils.getDefinitionByName;
+    
+    import se.stade.babbla.formatting.format;
+    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AnyAttribute;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeOperator;
+    import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
+    import se.stade.parsing.Expression;
 
-	public class AttributeSelector implements ElementMatcher, Expression
-	{
-		public function AttributeSelector(name:String, operator:AttributeOperator = null, ns:String = null)
-		{
-			this.name = name;
-			this.operator = operator || AnyAttribute.Instance;
+    public class AttributeSelector implements ElementMatcher, Expression
+    {
+        public function AttributeSelector(name:String, operator:AttributeOperator = null, ns:String = null)
+        {
+            this.name = name;
+            this.operator = operator || AnyAttribute.Instance;
             
             if (ns && ns != "*")
             {
@@ -42,15 +42,15 @@ package se.stade.flash.dom.querying.css.selectors.attributes
                name: ns + name,
                operator: operator || ""
             });
-		}
-		
-		private var name:String;
+        }
+        
+        private var name:String;
         private var selector:String;
-		private var namespace:Namespace;
-		private var operator:AttributeOperator;
-		
-		public function matches(element:DisplayObject):Boolean
-		{
+        private var namespace:Namespace;
+        private var operator:AttributeOperator;
+        
+        public function matches(element:DisplayObject):Boolean
+        {
             if (namespace)
             {
                 try
@@ -66,11 +66,11 @@ package se.stade.flash.dom.querying.css.selectors.attributes
             
             value = element[name];
             return operator.matches(value);
-		}
-		
-		public function toString():String
-		{
+        }
+        
+        public function toString():String
+        {
             return selector;
-		}
-	}
+        }
+    }
 }

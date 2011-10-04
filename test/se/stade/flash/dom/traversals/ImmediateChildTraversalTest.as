@@ -13,7 +13,7 @@ package se.stade.flash.dom.traversals
     import spark.components.Scroller;
     
     public class ImmediateChildTraversalTest extends TraversalTest
-    {				
+    {               
         private var traverser:Children;
         
         [Before]

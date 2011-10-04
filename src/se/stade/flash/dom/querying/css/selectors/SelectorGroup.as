@@ -1,12 +1,12 @@
 package se.stade.flash.dom.querying.css.selectors
 {
-	import flash.display.DisplayObject;
-	
-	import se.stade.flash.dom.querying.ElementMatcher;
-	import se.stade.parsing.Expression;
+    import flash.display.DisplayObject;
+    
+    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.parsing.Expression;
 
-	public class SelectorGroup implements ElementMatcher, Expression
-	{
+    public class SelectorGroup implements ElementMatcher, Expression
+    {
         public static function named(name:String, selector:ElementMatcher, ...selectors):SelectorGroup
         {
             var list:Vector.<ElementMatcher> = Vector.<ElementMatcher>([selector].concat(selectors));
@@ -30,9 +30,9 @@ package se.stade.flash.dom.querying.css.selectors
         
         private var name:String;
         private var selectors:Vector.<ElementMatcher>;
-		
-		public function matches(element:DisplayObject):Boolean
-		{
+        
+        public function matches(element:DisplayObject):Boolean
+        {
             for each (var selector:ElementMatcher in selectors)
             {
                 if (selector.matches(element))
@@ -40,11 +40,11 @@ package se.stade.flash.dom.querying.css.selectors
             }
             
             return false;
-		}
-		
-		public function toString():String
-		{
+        }
+        
+        public function toString():String
+        {
             return name;
-		}
-	}
+        }
+    }
 }

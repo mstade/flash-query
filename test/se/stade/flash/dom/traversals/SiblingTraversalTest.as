@@ -11,7 +11,7 @@ package se.stade.flash.dom.traversals
     import spark.components.RadioButton;
     
     public class SiblingTraversalTest extends TraversalTest
-    {		
+    {       
         private var traverser:Siblings;
         
         [Before]

@@ -1,22 +1,22 @@
 package se.stade.flash.dom.querying.css.parsing.rules
 {
-	import flash.utils.Dictionary;
-	
-	import se.stade.flash.dom.querying.ElementMatcher;
-	import se.stade.flash.dom.querying.css.parsing.SelectorToken;
-	import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
-	import se.stade.flash.dom.querying.css.selectors.combinators.ChildSelector;
-	import se.stade.flash.dom.querying.css.selectors.combinators.DescendantSelector;
-	import se.stade.flash.dom.querying.css.selectors.combinators.SiblingSelector;
-	import se.stade.parsing.Expression;
-	import se.stade.parsing.Token;
-	import se.stade.parsing.TokenStream;
-	import se.stade.parsing.pratt.InfixRule;
-	import se.stade.parsing.pratt.Parser;
-	import se.stade.stilts.string.trim;
+    import flash.utils.Dictionary;
+    
+    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.parsing.SelectorToken;
+    import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
+    import se.stade.flash.dom.querying.css.selectors.combinators.ChildSelector;
+    import se.stade.flash.dom.querying.css.selectors.combinators.DescendantSelector;
+    import se.stade.flash.dom.querying.css.selectors.combinators.SiblingSelector;
+    import se.stade.parsing.Expression;
+    import se.stade.parsing.Token;
+    import se.stade.parsing.TokenStream;
+    import se.stade.parsing.pratt.InfixRule;
+    import se.stade.parsing.pratt.Parser;
+    import se.stade.stilts.string.trim;
 
-	public class CombinatorRule implements InfixRule
-	{
+    public class CombinatorRule implements InfixRule
+    {
         public function CombinatorRule()
         {
             factories = new Dictionary;
@@ -53,5 +53,5 @@ package se.stade.flash.dom.querying.css.parsing.rules
             var Combinator:Class = factories[current.type];
             return new Combinator(left, right);
         }
-	}
+    }
 }

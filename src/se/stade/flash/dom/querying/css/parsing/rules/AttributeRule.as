@@ -1,24 +1,24 @@
 package se.stade.flash.dom.querying.css.parsing.rules
 {
-	import flash.utils.Dictionary;
-	
-	import se.stade.flash.dom.querying.css.parsing.SelectorToken;
-	import se.stade.flash.dom.querying.css.selectors.attributes.AttributeSelector;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeBeginsWith;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeContains;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeEndsWith;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeEquals;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeIsOneOf;
-	import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeOperator;
-	import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
-	import se.stade.parsing.Expression;
-	import se.stade.parsing.Token;
-	import se.stade.parsing.TokenStream;
-	import se.stade.parsing.pratt.Parser;
-	import se.stade.parsing.pratt.PrefixRule;
-	
-	public class AttributeRule implements PrefixRule
-	{
+    import flash.utils.Dictionary;
+    
+    import se.stade.flash.dom.querying.css.parsing.SelectorToken;
+    import se.stade.flash.dom.querying.css.selectors.attributes.AttributeSelector;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeBeginsWith;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeContains;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeEndsWith;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeEquals;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeIsOneOf;
+    import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeOperator;
+    import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
+    import se.stade.parsing.Expression;
+    import se.stade.parsing.Token;
+    import se.stade.parsing.TokenStream;
+    import se.stade.parsing.pratt.Parser;
+    import se.stade.parsing.pratt.PrefixRule;
+    
+    public class AttributeRule implements PrefixRule
+    {
         private static const OperatorType:Dictionary = new Dictionary;
         {
             OperatorType[SelectorToken.Equals] = AttributeEquals;
@@ -71,5 +71,5 @@ package se.stade.flash.dom.querying.css.parsing.rules
             
             return new AttributeSelector(name, operator, namespace);
         }
-	}
+    }
 }

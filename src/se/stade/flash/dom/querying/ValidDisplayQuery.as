@@ -1,10 +1,10 @@
 package se.stade.flash.dom.querying
 {
-	import flash.display.DisplayObject;
-	
-	import se.stade.flash.dom.DisplayNode;
-	import se.stade.flash.dom.querying.limits.NoLimit;
-	import se.stade.flash.dom.traversals.DisplayListTraversal;
+    import flash.display.DisplayObject;
+    
+    import se.stade.flash.dom.DisplayNode;
+    import se.stade.flash.dom.querying.limits.NoLimit;
+    import se.stade.flash.dom.traversals.DisplayListTraversal;
 
     public class ValidDisplayQuery implements DisplayListQuery
     {

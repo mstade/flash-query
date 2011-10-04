@@ -1,10 +1,10 @@
 package se.stade.flash.dom.querying.css.selectors.type
 {
-	import flash.display.DisplayObject;
-	
-	import se.stade.daffodil.Reflect;
-	import se.stade.daffodil.types.TypeReflection;
-	import se.stade.flash.dom.querying.ElementMatcher;
+    import flash.display.DisplayObject;
+    
+    import se.stade.daffodil.Reflect;
+    import se.stade.daffodil.types.TypeReflection;
+    import se.stade.flash.dom.querying.ElementMatcher;
 
     public class ElementSelector extends ElementSelectorBase implements ElementMatcher
     {
