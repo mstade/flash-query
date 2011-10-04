@@ -6,36 +6,46 @@ package se.stade.flash.dom
     import flash.utils.Dictionary;
     
     import se.stade.flash.dom.events.EventListenerCollection;
-    import se.stade.flash.dom.events.EventListenerParameters;
-    import se.stade.flash.dom.querying.DisplayQuery;
+    import se.stade.flash.dom.nodes.DisplayNodeFactory;
     import se.stade.flash.dom.querying.QueryResult;
-    import se.stade.flash.dom.traversals.DepthFirstTraversal;
-    import se.stade.flash.dom.traversals.DisplayListTraversal;
+    import se.stade.flash.dom.querying.ValidDisplayQuery;
+    import se.stade.flash.dom.traversals.DepthFirst;
     import se.stade.stilts.Disposable;
+    import se.stade.stilts.PropertySet;
 
     public class DisplayListWatcher implements Disposable
     {
-        public function DisplayListWatcher(query:DisplayQuery, context:FlashQuery, elements:Array)
+        public function DisplayListWatcher(query:ValidDisplayQuery, context:FlashQuery, nodes:Vector.<DisplayNode>)
         {
             this.query = query;
             this.context = context;
-            
             context.addEventListener(Event.ADDED, handleAddedElement);
-            context.addEventListener(Event.REMOVED, handleRemovedElement);
+            context.addEventListener(Event.REMOVED_FROM_STAGE, handleRemovedElement);
+            
+            this.nodes = nodes;
+            
+            for each (var node:DisplayNode in nodes)
+            {
+                nodeTable[node.element] = node;
+            }
         }
         
-        private var query:DisplayQuery;
+        private var query:ValidDisplayQuery;
         private var context:FlashQuery;
-        private var elements:Array;
+        
+        private var nodes:Vector.<DisplayNode>;
+        private var nodeTable:Dictionary = new Dictionary;
         
         public function dispose():void
         {
-            context = null;
             context.removeEventListener(Event.ADDED, handleAddedElement);
             context.removeEventListener(Event.REMOVED, handleAddedElement);
+            context = null;
+            query = null;
+            nodes = null;
         }
         
-        private var properties:Dictionary = new Dictionary;
+        private var properties:PropertySet = new PropertySet;
         
         public function set(properties:Object):void
         {
@@ -59,52 +69,47 @@ package se.stade.flash.dom
         
         protected function handleAddedElement(added:Event):void
         {
-            var addedElements:DisplayListTraversal = new DepthFirstTraversal(
-                new <DisplayObject>[added.target as DisplayObject]
+            var result:QueryResult = query.find(
+                DepthFirst.through(
+                    DisplayNodeFactory.list(added.target as DisplayObject)
+                )
             );
             
-            var result:ElementProxy = new ElementProxy(query.execute(addedElements).matches);
-            result.set(properties);
+            var distinctMatches:Vector.<DisplayNode> = new <DisplayNode>[];
             
-            for each (var event:EventListenerParameters in events.getListeners())
+            for each (var node:DisplayNode in result.matches)
             {
-                result.addEventListener(event.type,
-                                        event.listener,
-                                        event.useCapture,
-                                        event.priority,
-                                        event.useWeakReference);
+                if (node.element in nodeTable)
+                    continue;
+                
+                distinctMatches.push(node);
+                nodeTable[node.element] = node;
             }
             
-            elements.push.apply(result.toArray());
+            var targets:ElementProxy = new ElementProxy(distinctMatches);
+            
+            properties.applyTo(targets);
+            events.addListener(targets);
+            targets.addEventListener(Event.REMOVED_FROM_STAGE, handleRemovedElement);
+            
+            nodes.push.apply(nodes, targets.toArray());
         }
         
         protected function handleRemovedElement(removed:Event):void
         {
-            var removedElements:DisplayListTraversal = new DepthFirstTraversal(
-                new <DisplayObject>[removed.target as DisplayObject]
-            );
+            var target:DisplayNode = DisplayNodeFactory.from(removed.target as IEventDispatcher);
             
-            var result:ElementProxy = new ElementProxy(query.execute(removedElements).matches);
+            target.removeEventListener(Event.ADDED, handleAddedElement);
+            target.removeEventListener(Event.REMOVED_FROM_STAGE, handleRemovedElement);
             
-            for each (var event:EventListenerParameters in events.getListeners())
+            events.removeListener(target);
+            
+            for (var i:int = 0; i < nodes.length; i++)
             {
-                result.removeEventListener(event.type, event.listener, event.useCapture);
-            }
-            
-            var lookup:Dictionary = new Dictionary;
-            
-            for each (var element:DisplayObject in result.elements)
-            {
-                lookup[element] = true;
-            }
-            
-            for (var i:int = 0; i < elements.length; i++)
-            {
-                if (elements[i] in lookup)
+                if (nodes[i].element == target.element)
                 {
-                    elements.splice(i, 1);
-                    elements[i].removeEventListener(Event.ADDED, handleAddedElement);
-                    elements[i].removeEventListener(Event.REMOVED, handleRemovedElement);
+                    delete nodeTable[nodes[i].element];
+                    nodes.splice(i, 1);
                 }
             }
         }

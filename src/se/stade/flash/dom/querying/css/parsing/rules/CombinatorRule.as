@@ -4,9 +4,9 @@ package se.stade.flash.dom.querying.css.parsing.rules
 	
 	import se.stade.flash.dom.querying.ElementMatcher;
 	import se.stade.flash.dom.querying.css.parsing.SelectorToken;
+	import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
 	import se.stade.flash.dom.querying.css.selectors.combinators.ChildSelector;
 	import se.stade.flash.dom.querying.css.selectors.combinators.DescendantSelector;
-	import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
 	import se.stade.flash.dom.querying.css.selectors.combinators.SiblingSelector;
 	import se.stade.parsing.Expression;
 	import se.stade.parsing.Token;

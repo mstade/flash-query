@@ -1,33 +1,20 @@
 package se.stade.flash.dom
 {
 	import flash.display.*;
-	import flash.events.Event;
-	import flash.utils.Dictionary;
 	
 	import se.stade.colligo.*;
-	import se.stade.daffodil.Reflect;
-	import se.stade.daffodil.types.QualifiedType;
 	import se.stade.flash.dom.events.*;
-	import se.stade.flash.dom.querying.DisplayQuery;
-	import se.stade.flash.dom.querying.ElementMatcher;
-	import se.stade.flash.dom.querying.QueryLimit;
-	import se.stade.flash.dom.querying.QueryResult;
+	import se.stade.flash.dom.nodes.*;
+	import se.stade.flash.dom.querying.*;
 	import se.stade.flash.dom.querying.css.parsing.*;
-	import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
-	import se.stade.flash.dom.querying.css.selectors.InvalidSelector;
-	import se.stade.flash.dom.querying.css.selectors.type.ElementSelector;
-	import se.stade.flash.dom.querying.css.selectors.type.ElementTypeSelector;
-	import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
-	import se.stade.flash.dom.querying.css.selectors.type.UniversalSelector;
-	import se.stade.flash.dom.querying.limits.LimitGroup;
-	import se.stade.flash.dom.querying.limits.MatchLimit;
-	import se.stade.flash.dom.querying.limits.UnmatchedLimit;
+	import se.stade.flash.dom.querying.css.selectors.*;
+	import se.stade.flash.dom.querying.css.selectors.type.*;
+	import se.stade.flash.dom.querying.limits.*;
 	import se.stade.flash.dom.traversals.*;
-	import se.stade.parsing.Language;
-	import se.stade.parsing.ParseError;
-	import se.stade.stilts.Disposable;
+	import se.stade.parsing.*;
+	import se.stade.stilts.*;
 	
-	public dynamic class FlashQuery extends ElementProxy implements Element, Countable, Collection, Processable, Indexable, Disposable, Arrayable
+	public dynamic class FlashQuery extends ElementProxy implements Disposable
 	{
 		public static const Empty:FlashQuery = new FlashQuery(null);
         
@@ -41,19 +28,19 @@ package se.stade.flash.dom
             if (additionalElements.length > 0)
                 allElements = allElements.concat(Vector.<DisplayObject>(additionalElements));
             
-            return new FlashQuery(allElements);
+            return new FlashQuery(DisplayNodeFactory.convert(allElements));
         }
         
-		public function FlashQuery(elements:Vector.<DisplayObject>, language:Language = null)
+		public function FlashQuery(elements:Vector.<DisplayNode>, language:Language = null)
 		{
-			super(elements || new Vector.<DisplayObject>);
+			super(elements || new Vector.<DisplayNode>);
             
             _context = this;
 			this.language = language;
-            this.query = new DisplayQuery(UniversalSelector.Instance);
+            this.query = new ValidDisplayQuery(UniversalSelector.Instance);
 		}
         
-        private var query:DisplayQuery;
+        protected var query:ValidDisplayQuery;
         
 		private var _context:FlashQuery;
 		
@@ -81,36 +68,32 @@ package se.stade.flash.dom
 			_language = value;
 		}
         
-        private var liveDisplay:DisplayListWatcher;
+        private var displayWatcher:DisplayListWatcher;
         
         public function get live():Boolean
         {
-            return liveDisplay != null;
+            return !!displayWatcher;
         }
         
         public function set live(value:Boolean):void
         {
             if (value != live)
             {
-                if (live)
-                {
-                    liveDisplay.dispose();
-                    liveDisplay = null;
-                }
-                
-                if (value)
-                {
-                    liveDisplay = new DisplayListWatcher(query, context, list);
-                }
+                live && displayWatcher.dispose();
+                displayWatcher = value ? new DisplayListWatcher(query, context, nodes) : null;
             }
         }
         
         protected var liveProperties:Object = {};
         
-        override public function get(property:String):*
+        override public function get(property:*):*
         {
-            var value:* = super.get(property);
-            return (value === undefined) ? find(property) : value;
+            if (property is Class)
+                return findType(property);
+            else if (property in super)
+                return super.get(property);
+            else
+                return find(String(property));
         }
         
         override public function set(properties:Object):void
@@ -123,72 +106,13 @@ package se.stade.flash.dom
             }
         }
         
-        protected function parse(expression:String):DisplayQuery
-        {
-            try
-            {
-                var selector:ElementMatcher = language.parse(expression) as ElementMatcher || new InvalidSelector(expression);
-            }
-            catch (error:ParseError)
-            {
-                trace("[FlashQuery WARNING] parsing '" + expression + "' failed with error:", error.message);
-                selector = new InvalidSelector(expression);
-            }
-            
-            return new DisplayQuery(selector);
-        }
-        
-        protected function execute(query:DisplayQuery,
-                                 traversal:DisplayListTraversal = null,
-                                 limit:QueryLimit = null):FlashQuery
-        {
-            traversal ||= new DepthFirstTraversal(elements);
-            var result:QueryResult = query.execute(traversal, limit);
-            
-            return wrap(result.matches);
-        }
-        
-        protected function wrap(elements:Vector.<DisplayObject>):FlashQuery
-        {
-            var result:FlashQuery = new FlashQuery(elements, language);
-            result._context = this;
-            result.query = query;
-            
-            return result;
-        }
-        
-        protected function parseAndExecute(expression:String,
-                                         traversal:DisplayListTraversal = null,
-                                         limit:QueryLimit = null):FlashQuery
-        {
-            var query:DisplayQuery = parse(expression);
-            return execute(query, traversal, limit);
-        }
-        
-		private var _roots:Vector.<DisplayObjectContainer>;
-		protected function get roots():Vector.<DisplayObjectContainer>
-		{
-			if (!_roots)
-			{
-				_roots = new <DisplayObjectContainer>[];
-				
-				for each (var root:DisplayObject in list)
-				{
-					if (root is DisplayObjectContainer)
-						_roots.push(root);
-				}
-			}
-			
-			return _roots;
-		}
-		
 		override public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
 		{
 			super.addEventListener(type, listener, useCapture, priority, useWeakReference);
             
-            if (liveDisplay)
+            if (live)
             {
-                liveDisplay.addEventListener(type, listener, useCapture, priority, useWeakReference);
+                displayWatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);
             }
 		}
 		
@@ -196,36 +120,66 @@ package se.stade.flash.dom
 		{
 			super.removeEventListener(type, listener, useCapture);
             
-            if (liveDisplay)
+            if (live)
             {
-                liveDisplay.removeEventListener(type, listener, useCapture);
+                displayWatcher.removeEventListener(type, listener, useCapture);
             }
 		}
+        
+        protected function parse(expression:String):ValidDisplayQuery
+        {
+            try
+            {
+                var selector:ElementMatcher = language.parse(expression) as ElementMatcher || new InvalidSelector(expression);
+            }
+            catch (error:ParseError)
+            {
+                CONFIG::debug
+                {
+                    trace("[DEBUG::FlashQuery] Parsing '" + expression + "' failed with error:", error.message);
+                }
+                
+                selector = new InvalidSelector(expression);
+            }
+            
+            return new ValidDisplayQuery(selector);
+        }
+        
+        protected function wrap(elements:Vector.<DisplayNode>):FlashQuery
+        {
+            var result:FlashQuery = new FlashQuery(elements, language);
+            result._context = this;
+            result.query = query;
+            
+            return result;
+        }
 		
 		public function join(other:FlashQuery):FlashQuery
 		{
-            var result:FlashQuery = wrap(elements.concat(other.elements));
-            result._contextcontext = this;
-            
-            var selectors:Vector.<ElementMatcher> = new <ElementMatcher>[query.selector, other.query.selector];
-            result.query = new DisplayQuery(new SelectorGroup(selectors));
+            var result:FlashQuery = wrap(nodes.concat(other.nodes));
+            result.query = ValidDisplayQuery.from(
+                SelectorGroup.from(
+                    query.selector,
+                    other.query.selector
+                )
+            );
             
             return result;
 		}
 		
 		public function eq(index:int):FlashQuery
 		{
-            return wrap(elements.slice(index, index + 1));
+            return wrap(nodes.slice(index, index + 1));
 		}
 		
-		public function first():FlashQuery
+		public function get first():FlashQuery
 		{
 			return eq(0);
 		}
 		
-		public function last():FlashQuery
+		public function get last():FlashQuery
 		{
-			return eq(count - 1);
+			return eq(length - 1);
 		}
         
 		/**
@@ -238,122 +192,140 @@ package se.stade.flash.dom
 		 * matched the given expression. If no matches are found, the result is
 		 * empty.
 		 */
-		public function find(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
+		public function find(expression:String, limit:QueryLimit = null):FlashQuery
 		{
-            return parseAndExecute(expression, new DepthFirstTraversal(children().elements), new MatchLimit(limit));
+            return wrap(
+                parse(expression)
+                .find(Descendants.of(nodes), limit)
+                .matches
+            );
 		}
         
-        public function type(Type:Class, limit:Number = uint.MAX_VALUE):FlashQuery
+        public function findType(Type:Class, limit:QueryLimit = null):FlashQuery
         {
-            var query:DisplayQuery = new DisplayQuery(new ElementTypeSelector(Type));
-            
-            return execute(query, new DepthFirstTraversal(elements), new MatchLimit(limit));
+            return wrap(
+                ValidDisplayQuery.from(new ElementTypeSelector(Type))
+                .find(Descendants.of(nodes), limit)
+                .matches
+            );
         }
 		
-		public function filter(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
+		public function filter(expression:String, limit:QueryLimit = null):FlashQuery
 		{
-            return parseAndExecute(expression, new LinearTraversal(elements), new MatchLimit(limit));
+            return wrap(
+                parse(expression)
+                .find(Linear.of(nodes), limit)
+                .matches
+            );
 		}
 		
-		public function children(expression:String = "*", limit:Number = uint.MAX_VALUE):FlashQuery
+		public function children(expression:String = "*", limit:QueryLimit = null):FlashQuery
 		{
-            return parseAndExecute(expression, new ImmediateChildTraversal(roots), new MatchLimit(limit));
+            return wrap(
+                parse(expression)
+                .find(Children.of(nodes), limit)
+                .matches
+            );
 		}
 		
 		public function parent(expression:String = "*"):FlashQuery
 		{
-			return ancestors(expression, 1);
+			return ancestors(expression, MatchLimit.of(1));
+		}
+        
+		public function ancestors(expression:String = "*", limit:QueryLimit = null):FlashQuery
+		{
+            return wrap(
+                parse(expression)
+                .find(Ancestors.of(nodes), limit)
+                .matches
+            );
 		}
 		
-		public function ancestors(expression:String = "*", limit:Number = uint.MAX_VALUE):FlashQuery
+		public function ancestorsUntil(expression:String):FlashQuery
 		{
-            return parseAndExecute(expression, new AncestorTraversal(elements), new MatchLimit(limit));
+            return ancestors(expression, UnmatchedLimit.of(1));
 		}
-		
-		public function ancestorsUntil(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
-		{
-            return parseAndExecute(expression, new AncestorTraversal(elements), new MatchLimit(limit));
-		}
+        
+        public function closest(expression:String):FlashQuery
+        {
+            return ancestors(expression, MatchLimit.of(1));
+        }
 		
 		public function are(expression:String):Boolean
 		{
-			return filter(expression).count == count;
+			return filter(expression).length == length;
 		}
 		
 		public function areAny(expression:String):Boolean
 		{
-			return filter(expression, 1).count > 0;
+			return filter(expression, MatchLimit.of(1)).length > 0;
 		}
 		
-		public function has(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
+		public function has(expression:String, limit:QueryLimit = null):FlashQuery
 		{
-			var matchingChildren:Vector.<DisplayObject> = new <DisplayObject>[];
-            
-            var query:DisplayQuery = parse(expression);
-            var max:QueryLimit = new MatchLimit(limit);
-			
-			for each (var root:DisplayObjectContainer in roots)
-			{
-                var traversal:DepthFirstTraversal = new DepthFirstTraversal(new <DisplayObject>[root]);
-                
-				if (query.execute(traversal, max).matches.length > 0)
-                    matchingChildren.push(root);
-				
-				if (limit == matchingChildren.length)
-					break;
-			}
-			
-			return wrap(matchingChildren);
+            return wrap(
+                parse(expression)
+                .find(Descendants.of(nodes), limit)
+                .matches
+            );
 		}
 		
-		public function siblings(expression:String = "*", limit:Number = uint.MAX_VALUE):FlashQuery
+		public function siblings(expression:String = "*", limit:QueryLimit = null):FlashQuery
 		{
-            return parseAndExecute(expression, new SiblingTraversal(elements), new MatchLimit(limit));
+            return wrap(
+                parse(expression)
+                .find(Siblings.of(nodes), limit)
+                .matches
+            );
 		}
 		
-		public function prev(expression:String = "*", limit:Number = uint.MAX_VALUE):FlashQuery
+		public function prev(expression:String = "*", limit:QueryLimit = null):FlashQuery
 		{
-            return parseAndExecute(expression, new PrecedingSiblingTraversal(elements), new MatchLimit(limit));
+            return wrap(
+                parse(expression)
+                .find(PrecedingSiblings.of(nodes), limit)
+                .matches
+            );
 		}
 		
-		public function prevUntil(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
+		public function prevUntil(expression:String):FlashQuery
 		{
-            return parseAndExecute(expression, new PrecedingSiblingTraversal(elements), LimitGroup.of(
-                MatchLimit.of(limit),
-                UnmatchedLimit.of(1)
-            ));
+            return prev(expression, UnmatchedLimit.of(1));
 		}
 		
-		public function next(expression:String = "*", limit:Number = uint.MAX_VALUE):FlashQuery
+		public function next(expression:String = "*", limit:QueryLimit = null):FlashQuery
 		{
-            return parseAndExecute(expression, new FollowingSiblingTraversal(elements), new MatchLimit(limit));
+            return wrap(
+                parse(expression)
+                .find(FollowingSiblings.of(nodes), limit)
+                .matches
+            );
 		}
 		
-		public function nextUntil(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
+		public function nextUntil(expression:String):FlashQuery
 		{
-            return parseAndExecute(expression, new FollowingSiblingTraversal(elements), LimitGroup.of(
-                MatchLimit.of(limit),
-                UnmatchedLimit.of(1)
-            ));
+            return next(expression, UnmatchedLimit.of(1));
 		}
 		
-		public function not(expression:String, limit:Number = uint.MAX_VALUE):FlashQuery
+		public function not(expression:String, limit:QueryLimit = null):FlashQuery
 		{
-            var query:DisplayQuery = parse(expression);
-            var result:QueryResult = query.execute(new LinearTraversal(elements), new MatchLimit(limit));
-            
-            return wrap(result.unmatched);
+            return wrap(
+                parse(expression)
+                .find(Linear.of(nodes), limit)
+                .unmatched
+            );
 		}
 		
 		public function slice(start:int, end:int):FlashQuery
 		{
-            return wrap(elements.slice(start, end));
+            return wrap(nodes.slice(start, end));
 		}
         
         public function dispose():void
         {
             live = false;
-            list = [];
+            nodes = new <DisplayNode>[];
             _context = this;
         }
 	}

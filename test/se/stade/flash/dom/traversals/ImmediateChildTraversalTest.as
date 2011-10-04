@@ -1,12 +1,11 @@
 package se.stade.flash.dom.traversals
 {
-    import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
-    
-    import flexunit.framework.Assert;
     
     import org.flexunit.assertThat;
     import org.hamcrest.core.isA;
+    
+    import se.stade.flash.dom.nodes.DisplayNodeFactory;
     
     import spark.components.ButtonBar;
     import spark.components.CheckBox;
@@ -15,7 +14,7 @@ package se.stade.flash.dom.traversals
     
     public class ImmediateChildTraversalTest extends TraversalTest
     {				
-        private var traverser:ImmediateChildTraversal;
+        private var traverser:Children;
         
         [Before]
         public function setUp():void
@@ -24,17 +23,17 @@ package se.stade.flash.dom.traversals
             var root1:DisplayObjectContainer = dom.getElementAt(2).getElementAt(0);
             var root2:DisplayObjectContainer = dom.getElementAt(2).getElementAt(1);
             
-            traverser = new ImmediateChildTraversal(new <DisplayObjectContainer>[root1, root2]);
+            traverser = new Children(DisplayNodeFactory.list(root1, root2));
         }
         
         [Test]
         public function shouldReturnChildrenFromBothRoots():void
         {
-            assertThat(traverser.getNext(), isA(CheckBox));
-            assertThat(traverser.getNext(), isA(ButtonBar));
+            assertThat(traverser.getNext().element, isA(CheckBox));
+            assertThat(traverser.getNext().element, isA(ButtonBar));
             
-            assertThat(traverser.getNext(), isA(RadioButton));
-            assertThat(traverser.getNext(), isA(Scroller));
+            assertThat(traverser.getNext().element, isA(RadioButton));
+            assertThat(traverser.getNext().element, isA(Scroller));
         }
         
         [Test]

@@ -1,8 +1,15 @@
 package se.stade.flash.dom.events
 {
+    import flash.events.Event;
+    import flash.events.IEventDispatcher;
+
 	public class EventListenerParameters
 	{
-		public function EventListenerParameters(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false)
+		public function EventListenerParameters(type:String,
+                                                listener:Function,
+                                                useCapture:Boolean = false,
+                                                priority:int = 0,
+                                                useWeakReference:Boolean = false)
 		{
 			_type = type;
 			_listener = listener;
@@ -40,5 +47,19 @@ package se.stade.flash.dom.events
 		{
 			return _useWeakReference;
 		}
+        
+        public function addListener(dispatcher:IEventDispatcher):void
+        {
+            dispatcher.addEventListener(type,
+                                        listener,
+                                        useCapture,
+                                        priority,
+                                        useWeakReference);
+        }
+        
+        public function removeListener(dispatcher:IEventDispatcher):void
+        {
+            dispatcher.removeEventListener(type, listener, useCapture);
+        }
 	}
 }

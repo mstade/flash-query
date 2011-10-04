@@ -1,23 +1,25 @@
 package se.stade.flash.dom.querying
 {
-    import flash.display.DisplayObject;
+    import se.stade.flash.dom.DisplayNode;
 
 	public final class QueryResult
 	{
-		public function QueryResult(matches:Vector.<DisplayObject> = null, unmatched:Vector.<DisplayObject> = null)
+        public static const Empty:QueryResult = new QueryResult;
+        
+		public function QueryResult(matches:Vector.<DisplayNode> = null, unmatched:Vector.<DisplayNode> = null)
 		{
-			_matches = matches || new Vector.<DisplayObject>();
-			_unmatched = unmatched || new Vector.<DisplayObject>();
+			_matches = matches || new Vector.<DisplayNode>;
+			_unmatched = unmatched || new Vector.<DisplayNode>;
 		}
 		
-		private var _matches:Vector.<DisplayObject>;
-		public function get matches():Vector.<DisplayObject>
+		private var _matches:Vector.<DisplayNode>;
+		public function get matches():Vector.<DisplayNode>
 		{
 			return _matches;
 		}
 		
-		private var _unmatched:Vector.<DisplayObject>;
-		public function get unmatched():Vector.<DisplayObject>
+		private var _unmatched:Vector.<DisplayNode>;
+		public function get unmatched():Vector.<DisplayNode>
 		{
 			return _unmatched;
 		}

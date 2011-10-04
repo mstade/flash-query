@@ -3,15 +3,15 @@ package se.stade.flash.dom.querying.limits
     import se.stade.flash.dom.querying.QueryLimit;
     import se.stade.flash.dom.querying.QueryResult;
     
-    public class LimitGroup implements QueryLimit
+    public class CombinedLimit implements QueryLimit
     {
-        public static function of(limit:QueryLimit, ... limits):LimitGroup
+        public static function of(limit:QueryLimit, ... limits):CombinedLimit
         {
             limits = [limit].concat(limits);
-            return new LimitGroup(Vector.<QueryLimit>([limits]));
+            return new CombinedLimit(Vector.<QueryLimit>([limits]));
         }
         
-        public function LimitGroup(limits:Vector.<QueryLimit>)
+        public function CombinedLimit(limits:Vector.<QueryLimit>)
         {
             this.limits = limits.slice();
         }

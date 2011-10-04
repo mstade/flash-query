@@ -42,12 +42,12 @@ package se.stade.flash.dom.querying.css.parsing.rules
             
             pseudoClasses.setMatcher("enabled",  new PositiveStateSelector("enabled"));
             pseudoClasses.setMatcher("selected", new PositiveStateSelector("selected"));
-            pseudoClasses.setMatcher("checked",  SelectorGroup.Named(":checked",
+            pseudoClasses.setMatcher("checked",  SelectorGroup.named(":checked",
                 new PositiveStateSelector("selected"),
                 new PositiveStateSelector("checked")
             ));
             
-            pseudoClasses.setMatcher("disabled", SelectorGroup.Named(":disabled",
+            pseudoClasses.setMatcher("disabled", SelectorGroup.named(":disabled",
                     new NegativeStateSelector("enabled"),
                     new PositiveStateSelector("disabled")
             ));
@@ -100,7 +100,7 @@ package se.stade.flash.dom.querying.css.parsing.rules
                 selectors.push(rule.evaluate(following.current, following, parser, precedence));
             }
             
-            return selectors.length > 1 ? SelectorGroup.Sequence.apply(null, selectors) : Expression(selectors[0]);
+            return selectors.length > 1 ? SelectorGroup.from.apply(null, selectors) : Expression(selectors[0]);
         }
         
         private function getRule(current:Token):PrefixRule

@@ -5,21 +5,21 @@ package se.stade.flash.dom.querying.limits
     
     public final class MatchLimit implements QueryLimit
     {
-        public static function of(limit:uint):MatchLimit
+        public static function of(length:uint):MatchLimit
         {
-            return new MatchLimit(limit);
+            return new MatchLimit(length);
         }
         
-        public function MatchLimit(limit:uint)
+        public function MatchLimit(length:uint)
         {
-            this.limit = limit;
+            this.length = length;
         }
         
-        private var limit:uint;
+        private var length:uint;
         
         public function isReached(result:QueryResult):Boolean
         {
-            return result.matches.length >= limit;
+            return result.matches.length >= length;
         }
     }
 }

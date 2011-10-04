@@ -1,5 +1,6 @@
 package se.stade.flash.dom.events
 {
+	import flash.events.IEventDispatcher;
 	import flash.utils.Dictionary;
 
 	public class EventListenerCollection
@@ -60,5 +61,21 @@ package se.stade.flash.dom.events
 		{
 			return compileHandlerList(capture);
 		}
+        
+        public function addListener(dispatcher:IEventDispatcher):void
+        {
+            for each (var event:EventListenerParameters in getListeners())
+            {
+                event.addListener(dispatcher);
+            }
+        }
+        
+        public function removeListener(dispatcher:IEventDispatcher):void
+        {
+            for each (var event:EventListenerParameters in getListeners())
+            {
+                event.removeListener(dispatcher);
+            }
+        }
 	}
 }

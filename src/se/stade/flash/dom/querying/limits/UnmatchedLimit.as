@@ -5,21 +5,21 @@ package se.stade.flash.dom.querying.limits
     
     public class UnmatchedLimit implements QueryLimit
     {
-        public static function of(limit:uint):UnmatchedLimit
+        public static function of(length:uint):UnmatchedLimit
         {
-            return new UnmatchedLimit(limit);
+            return new UnmatchedLimit(length);
         }
         
-        public function UnmatchedLimit(limit:uint)
+        public function UnmatchedLimit(length:uint)
         {
-            this.limit = limit;
+            this.length = length;
         }
         
-        private var limit:uint;
+        private var length:uint;
         
         public function isReached(result:QueryResult):Boolean
         {
-            return result.unmatched.length >= limit;
+            return result.unmatched.length >= length;
         }
     }
 }

@@ -7,7 +7,7 @@ package se.stade.flash.dom.querying.css.selectors
 
 	public class SelectorGroup implements ElementMatcher, Expression
 	{
-        public static function Named(name:String, selector:ElementMatcher, ...selectors):SelectorGroup
+        public static function named(name:String, selector:ElementMatcher, ...selectors):SelectorGroup
         {
             var list:Vector.<ElementMatcher> = Vector.<ElementMatcher>([selector].concat(selectors));
             var sequence:SelectorGroup = new SelectorGroup(list);
@@ -16,10 +16,10 @@ package se.stade.flash.dom.querying.css.selectors
             return sequence;
         }
         
-        public static function Sequence(selector:ElementMatcher, ...selectors):SelectorGroup
+        public static function from(selector:ElementMatcher, ...selectors):SelectorGroup
         {
             selectors = [selector].concat(selectors);
-            return Named.apply(null, [selectors.join("")].concat(selectors));
+            return named.apply(null, [selectors.join("")].concat(selectors));
         }
         
         public function SelectorGroup(selectors:Vector.<ElementMatcher>)
@@ -29,31 +29,17 @@ package se.stade.flash.dom.querying.css.selectors
         }
         
         private var name:String;
-        private var matchAny:Boolean = true;
         private var selectors:Vector.<ElementMatcher>;
 		
 		public function matches(element:DisplayObject):Boolean
 		{
-            if (matchAny)
+            for each (var selector:ElementMatcher in selectors)
             {
-                for each (var selector:ElementMatcher in selectors)
-                {
-                    if (selector.matches(element))
-                        return true;
-                }
-                
-                return false;
+                if (selector.matches(element))
+                    return true;
             }
-            else
-            {
-                for each (selector in selectors)
-                {
-                    if (!selector.matches(element))
-                        return false;
-                }
-                
-                return true;
-            }
+            
+            return false;
 		}
 		
 		public function toString():String

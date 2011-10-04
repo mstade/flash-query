@@ -1,14 +1,6 @@
 package se.stade.flash.dom.querying.css.parsing
 {
-    import se.stade.flash.dom.querying.css.parsing.rules.AttributeRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.ClassRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.CombinatorRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.ElementRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.IdentityRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.PseudoClassRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.PseudoFunctionRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.PseudoSelectorRule;
-    import se.stade.flash.dom.querying.css.parsing.rules.SimpleSelectorRule;
+    import se.stade.flash.dom.querying.css.parsing.rules.*;
     import se.stade.flash.dom.querying.css.selectors.pseudo.functions.structural.HasSelector;
     import se.stade.flash.dom.querying.css.selectors.pseudo.functions.NotSelector;
     import se.stade.flash.dom.querying.css.selectors.type.ElementSelector;

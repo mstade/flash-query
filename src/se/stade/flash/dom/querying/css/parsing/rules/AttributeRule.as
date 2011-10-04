@@ -33,7 +33,7 @@ package se.stade.flash.dom.querying.css.parsing.rules
             if (stream.ignore(SelectorToken.Whitespace)
                       .accept(SelectorToken.Namespace))
             {
-                var namespace:NamespaceSelector = new NamespaceSelector(stream.value.substr(0, -1));
+                var namespace:String = stream.value.substr(0, -1);
             }
             
             var name:String = stream.expect(SelectorToken.Name).value;

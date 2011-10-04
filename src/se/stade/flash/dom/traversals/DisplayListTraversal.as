@@ -1,10 +1,10 @@
 package se.stade.flash.dom.traversals
 {
-	import flash.display.DisplayObject;
+	import se.stade.flash.dom.DisplayNode;
 
 	/**
 	 * A DisplayListTraverser is used to traverse a list of
-	 * DisplayObject instances.
+	 * display elements.
 	 */
 	public interface DisplayListTraversal
 	{
@@ -21,7 +21,7 @@ package se.stade.flash.dom.traversals
 		 * 
 		 * @return The next element in line. 
 		 */
-		function getNext():DisplayObject;
+		function getNext():DisplayNode;
 		
 		/**
 		 * Resets the state of the traverser to its initial state.

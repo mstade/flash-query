@@ -5,6 +5,8 @@ package se.stade.flash.dom.traversals
     import org.flexunit.assertThat;
     import org.hamcrest.core.isA;
     
+    import se.stade.flash.dom.nodes.DisplayNodeFactory;
+    
     import spark.components.Button;
     import spark.components.ButtonBar;
     import spark.components.CheckBox;
@@ -15,31 +17,31 @@ package se.stade.flash.dom.traversals
     
     public class DepthFirstTraversalTest extends TraversalTest
     {
-        private var traverser:DepthFirstTraversal;
+        private var traverser:DepthFirst;
         
         [Before]
         public function setUp():void
         {
-            traverser = new DepthFirstTraversal(new <DisplayObject>[createDOM()]);
+            traverser = new DepthFirst(DisplayNodeFactory.list(createDOM()));
         }
         
         [Test]
         public function shouldTraverseWholeDocument():void
         {
-            assertThat(traverser.getNext(), isA(Group))
+            assertThat(traverser.getNext().element, isA(Group))
             
-            assertThat(traverser.getNext(), isA(Button))
-            assertThat(traverser.getNext(), isA(List))
+            assertThat(traverser.getNext().element, isA(Button))
+            assertThat(traverser.getNext().element, isA(List))
             
-            assertThat(traverser.getNext(), isA(Group))
+            assertThat(traverser.getNext().element, isA(Group))
 
-            assertThat(traverser.getNext(), isA(Group))
-            assertThat(traverser.getNext(), isA(CheckBox))
-            assertThat(traverser.getNext(), isA(ButtonBar))
+            assertThat(traverser.getNext().element, isA(Group))
+            assertThat(traverser.getNext().element, isA(CheckBox))
+            assertThat(traverser.getNext().element, isA(ButtonBar))
             
-            assertThat(traverser.getNext(), isA(Group))
-            assertThat(traverser.getNext(), isA(RadioButton))
-            assertThat(traverser.getNext(), isA(Scroller))
+            assertThat(traverser.getNext().element, isA(Group))
+            assertThat(traverser.getNext().element, isA(RadioButton))
+            assertThat(traverser.getNext().element, isA(Scroller))
         }
         
         [Test]

@@ -23,12 +23,8 @@ package se.stade.flash.dom.querying.css.parsing
         
         /**
          * All of the following queries are valid and have
-         * been picked up from various sources, listed below
-         * in no particular order:
-         *  
-         * http://tools.css3.info/selectors-test/test.html
+         * been picked up from various sources.
          */
-        
         public static var valid:Array = [
             // Type selectors
             ["*"], ["*|"], ["root|*"],  ["root.sub|*"],
@@ -101,7 +97,6 @@ package se.stade.flash.dom.querying.css.parsing
             ["p[foo] > [bar] > *, li"],
             ["p[foo] > [bar], li > p.foo"],
             
-            // Really hairy
             ["p[foo = 'foo > bar'] > [bar]"],
             ["p[foo *= '\"foo\"' bar baz]",      "p[foo *= '\"foo\" bar baz']"],
             ["p[foo ^= foo, bar  ] > [bar]",     "p[foo ^= 'foo, bar'] > [bar]"],
@@ -120,6 +115,192 @@ package se.stade.flash.dom.querying.css.parsing
             [":not(#id)"],    ["div:not(#id)"],    ["div :not(#id)"],    ["div > :not(#id)"],
             [":not(.class)"], ["div:not(.class)"], ["div :not(.class)"], ["div > :not(.class)"],
             [":state(over)"], ["div:state(over)"], ["div :state(over)"], ["div > :state(over)"],
+            
+            /* Tests from: https://github.com/dperini/nwmatcher/blob/master/test/W3C-Selector-tests/W3C-Selector-tests-github.html */
+            ["body"],
+            ["div"],
+            ["div.header"],
+            
+            [".unitTest"],
+            [".test"],
+            
+            [".UI > *"],
+            [".UI"],
+            [".tilda"],
+            [".plus"],
+            
+            ["h1, p"],
+            ["a"],
+            ["#results"],
+            ["#root, #root2, #root3"],
+            
+            [".blox16"],
+            [".blox17"],
+            [".lastChild > p"],
+            [".firstOfType > p"],
+            [".lastOfType > p"],
+            [".empty > .isEmpty"],
+            ["html"],
+            
+            ["html.nopass pass"],
+            
+            /* :target selector */
+            [".target :target"],
+            
+            /* test 1 : childhood selector */
+            ["html > body"],
+            [".test > .blox1"],
+            
+            /* test 2 : attribute existence selector */
+            /* attribute with a value */
+            [".blox2[align]"],
+            
+            /* attribute with empty value */
+            [".blox3[align]"],
+            
+            /* attribute with empty value */
+            [".blox4, .blox5"],
+            [".blox4[align], .blox5[align]"],
+            
+            /* test3 : attribute value selector */
+            ['.blox6[align="center"]'],
+            ['.blox6[align="c"]'],
+            ['.blox6[align="centera"]'],
+            ['.blox6[foo="\e9"]'],
+            ['.blox6[\_foo="c"]'],
+            
+            /* test 4 : [~=] */
+            ['.blox7[class~="foo"]'],
+            [".blox8, .blox9, .blox10"],
+            ['.blox8[class~=""]'],
+            ['.blox9[foo~=""]'],
+            ['.blox10[foo~="foo"]'],
+            
+            /* test5 [^=] */
+            [".attrStart > .t3"],
+            [".attrStart > .t1[class^='unit']"],
+            [".attrStart > .t2"],
+            [".attrStart > .t2[class^='nit']"],
+            [".attrStart > .t3[class^='']"],
+            [".attrStart > .t4[foo^='\e9']"],
+            
+            /* test6 [$=] */
+            [".attrEnd > .t3"],
+            [".attrEnd > .t1[class$='t1']"],
+            [".attrEnd > .t2"],
+            [".attrEnd > .t2[class$='unit']"],
+            [".attrEnd > .t3[align$='']"],
+            [".attrEnd > .t4[foo$='\e9']"],
+            
+            /* test7 [*=] */
+            ['.attrMiddle > .t3'],
+            ['.attrMiddle > .t1[class*="t t"]'],
+            ['.attrMiddle > .t2'],
+            ['.attrMiddle > .t2[class*="a"]'],
+            ['.attrMiddle > .t3[align*=""]'],
+            ['.attrMiddle > .t4[foo*="\e9"]'],
+            
+            /* :first-child tests */
+            ['.firstChild .unitTest:first-child'],
+            ['.blox12:first-child'],
+            ['.blox13:first-child'],
+            ['.blox12, .blox13'],
+            
+            /* :root tests */
+            // [':root'], // Root is a pretty useless selector
+            
+            /* :nth-child(n) tests */
+            ['.nthchild1 > :nth-last-child(odd)'],
+            ['.nthchild1 > :nth-child(odd)'],
+        
+            ['.nthchild2 > :nth-last-child(even)'],
+            ['.nthchild2 > :nth-child(even)'],
+            
+            ['.nthchild3 > :nth-child(3n+2)'],
+            ['.nthchild3 > :nth-last-child(3n+1)'],
+            ['.nthchild3 > :nth-last-child(3n+3)'],
+            
+            ['.nthoftype1 > div:nth-of-type(odd)'],
+            ['.nthoftype1 > div:nth-last-of-type(odd)'],
+            ['.nthoftype1 > p'],
+            
+            ['.nthoftype2 > div:nth-of-type(even)'],
+            ['.nthoftype2 > div:nth-last-of-type(even)'],
+            ['.nthoftype2 > p'],
+            
+            ['.nthoftype3 > div:nth-of-type(3n+1)'],
+            ['.nthoftype3 > div:nth-last-of-type(3n+1)'],
+            ['.nthoftype3 > div:nth-last-of-type(3n+2)'],
+            ['.nthoftype3 > p'],
+            
+            /* :not() tests */
+            ['.blox14:not(span)'],
+            ['.blox15:not([foo="blox14"])'],
+            ['.blox16:not(.blox15)'],
+            ['div:not(:not(div))'],
+            
+            /* :only-of-type tests */
+            ['.blox17:only-of-type'],
+            ['.blox18:only-of-type'],
+            ['.blox18:not(:only-of-type)'],
+            
+            /* :last-child tests */
+            ['.lastChild > :last-child'],
+            ['.lastChild > :not(:last-child)'],
+            
+            /* :first-of-type tests */
+            ['.firstOfType > *:first-of-type'],
+            ['*.firstOfType > :not(:first-of-type)'],
+            
+            /* :last-of-type tests */
+            ['.lastOfType > *:last-of-type'],
+            ['*.lastOfType > :not(:last-of-type)'],
+            
+            /* :only-child tests */
+            ['.onlyChild > *:not(:only-child)'],
+            ['.onlyChild > .unitTest > *:only-child'],
+        
+            /* :only-of-type tests */
+            ['.onlyOfType *:only-of-type'],
+            ['.onlyOfType *:not(:only-of-type)'],
+            
+            /* :empty tests */
+            ['.empty > *.isEmpty:empty'],
+            ['.empty > .isNotEmpty'],
+            ['.empty > .isNotEmpty:empty'],
+            ['.empty > .isNotEmpty:not(:empty)'],
+            
+            /* :lang() tests */
+            ['.lang :lang(en)'],
+            ['.lang :lang(fr)'],
+            ['.lang .t1'],
+            ['.lang .t1:lang(es)'],
+            ['.lang :lang(es-AR)'],
+            
+            /* [|=] tests */
+            ['.attrLang .t1'],
+            ['.attrLang .t1[lang|="en"]'],
+            ['.attrLang [lang|="fr"]'],
+            ['.attrLang .t2[lang|="en"]'],
+            ['.attrLang .t3'],
+            ['.attrLang .t3[lang|="es"]'],
+            ['.attrLang [lang|="es-AR"]'],
+            
+            /* UI tests */
+            ['.UI .t1:enabled > .unitTest'],
+            ['.UI .t2:disabled > .unitTest'],
+            ['.UI .t3:checked + div'],
+            ['.UI .t4:not(:checked) + div'],
+            
+            /* ~ combinator tests */
+            ['.tilda .t1'],
+            ['.tilda .t1 ~ .unitTest'],
+            ['.tilda .t1:hover ~ .unitTest'],
+            
+            /* ~ combinator tests */
+            ['.plus .t1, .plus .t2'],
+            ['.plus .t1 + .unitTest + .unitTest'],
+            ['.plus .t1:hover + .unitTest + .unitTest'],
         ];
         
         [Test(dataProvider="valid")]
@@ -132,6 +313,34 @@ package se.stade.flash.dom.querying.css.parsing
         
         public static var broken:Array = [
             ["p[foo],"],
+            
+            ['.blox16:not(.blox15[foo="blox14"]'],
+            
+            /* Tests from http://www.w3.org/Style/CSS/Test/CSS3/Selectors/20060307/html/index.html */
+            ['div,'],
+            ['.5cm'],
+            ['foo &amp; address, p'],
+            ['[*=test]'],
+            ['[*|*=test]'],
+            
+            ['div:subject'],
+            [':canvas'],
+            [':viewport'],
+            [':window'],
+            [':root'], // Root is a pretty useless selector so we choose not to implement it
+            [':menu'],
+            [':table'],
+            [':select'],
+            ['::canvas'],
+            ['::viewport'],
+            ['::window'],
+            ['::menu'],
+            ['::table'],
+            ['::select'],
+            
+            ['..test'],
+            ['.foo..quux'],
+            ['.bar.'],
         ];
         
         [Test(dataProvider="broken", expects="se.stade.parsing.ParseError")]

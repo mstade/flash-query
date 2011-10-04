@@ -2,18 +2,17 @@ package se.stade.flash.dom.traversals
 {
     import flash.display.DisplayObject;
     
-    import flexunit.framework.Assert;
-    
     import org.flexunit.assertThat;
     import org.hamcrest.core.isA;
     
+    import se.stade.flash.dom.nodes.DisplayNodeFactory;
+    
     import spark.components.ButtonBar;
-    import spark.components.CheckBox;
     import spark.components.Scroller;
     
     public class FollowingSiblingTraversalTest extends TraversalTest
     {		
-        private var traverser:FollowingSiblingTraversal;
+        private var traverser:FollowingSiblings;
         
         [Before]
         public function setUp():void
@@ -22,14 +21,14 @@ package se.stade.flash.dom.traversals
             var start1:DisplayObject = dom.getElementAt(2).getElementAt(0).getElementAt(0);
             var start2:DisplayObject = dom.getElementAt(2).getElementAt(1).getElementAt(0);
             
-            traverser = new FollowingSiblingTraversal(new <DisplayObject>[start1, start2]);
+            traverser = new FollowingSiblings(DisplayNodeFactory.list(start1, start2));
         }
         
         [Test]
         public function shouldReturnCheckBoxAndScroller():void
         {
-            assertThat(traverser.getNext(), isA(ButtonBar));
-            assertThat(traverser.getNext(), isA(Scroller));
+            assertThat(traverser.getNext().element, isA(ButtonBar));
+            assertThat(traverser.getNext().element, isA(Scroller));
         }
         
         [Test]

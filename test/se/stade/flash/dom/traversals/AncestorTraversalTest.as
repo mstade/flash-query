@@ -7,12 +7,14 @@ package se.stade.flash.dom.traversals
     import org.flexunit.assertThat;
     import org.hamcrest.core.isA;
     
+    import se.stade.flash.dom.nodes.DisplayNodeFactory;
+    
     import spark.components.Button;
     import spark.components.Group;
     
     public class AncestorTraversalTest extends TraversalTest
     {		
-        private var traverser:AncestorTraversal;
+        private var traverser:Ancestors;
         
         [Before]
         public function setUp():void
@@ -21,19 +23,19 @@ package se.stade.flash.dom.traversals
             var start1:DisplayObject = dom.getElementAt(2).getElementAt(0).getElementAt(0);
             var start2:DisplayObject = dom.getElementAt(2).getElementAt(1).getElementAt(0);
             
-            traverser = new AncestorTraversal(new <DisplayObject>[start1, start2]);
+            traverser = new Ancestors(DisplayNodeFactory.list(start1, start2));
         }
         
         [Test]
         public function shouldReturnAncestorsForBothStarts():void
         {
-            assertThat(traverser.getNext(), isA(Group));
-            assertThat(traverser.getNext(), isA(Group));
-            assertThat(traverser.getNext(), isA(Group));
+            assertThat(traverser.getNext().element, isA(Group));
+            assertThat(traverser.getNext().element, isA(Group));
+            assertThat(traverser.getNext().element, isA(Group));
             
-            assertThat(traverser.getNext(), isA(Group));
-            assertThat(traverser.getNext(), isA(Group));
-            assertThat(traverser.getNext(), isA(Group));
+            assertThat(traverser.getNext().element, isA(Group));
+            assertThat(traverser.getNext().element, isA(Group));
+            assertThat(traverser.getNext().element, isA(Group));
         }
         
         [Test]
