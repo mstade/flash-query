@@ -5,7 +5,7 @@ package se.stade.flash.dom
 
     public interface DisplayNode extends IEventDispatcher
     {
-        function get element():IEventDispatcher;
+        function get element():*;
         
         function get index():int;
         

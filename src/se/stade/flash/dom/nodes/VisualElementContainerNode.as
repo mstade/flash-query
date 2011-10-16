@@ -17,14 +17,14 @@ package se.stade.flash.dom.nodes
         }
         
         private var _element:*;
-        public function get element():IEventDispatcher
+        public function get element():*
         {
             return _element;
         }
         
         public function get index():int
         {
-            var owner:DisplayObjectContainer = element["owner"] as DisplayObjectContainer;
+            var owner:DisplayObjectContainer = element["owner"];
             return owner ? owner.getChildIndex(_element) : -1;
         }
         
@@ -54,9 +54,17 @@ package se.stade.flash.dom.nodes
             return _prevSiblings;
         }
         
-        public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+        public function addEventListener(type:String,
+                                         listener:Function,
+                                         useCapture:Boolean = false,
+                                         priority:int = 0,
+                                         useWeakReference:Boolean = false):void
         {
-            element.addEventListener(type, listener, useCapture, priority, useWeakReference);
+            element.addEventListener(type,
+                                     listener,
+                                     useCapture,
+                                     priority,
+                                     useWeakReference);
         }
         
         public function dispatchEvent(event:Event):Boolean
@@ -64,7 +72,9 @@ package se.stade.flash.dom.nodes
             return element.dispatchEvent(event);
         }
         
-        public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void
+        public function removeEventListener(type:String,
+                                            listener:Function,
+                                            useCapture:Boolean = false):void
         {
             element.removeEventListener(type, listener, useCapture);
         }

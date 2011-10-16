@@ -1,11 +1,10 @@
 package se.stade.flash.dom.querying.css.selectors.combinators
 {
-    import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
 
-    public interface CombinatorMatcher extends ElementMatcher, Expression
+    public interface CombinatorMatcher extends Selector
     {
-        function get left():ElementMatcher;
-        function get right():ElementMatcher;
+        function get left():Selector;
+        function get right():Selector;
     }
 }

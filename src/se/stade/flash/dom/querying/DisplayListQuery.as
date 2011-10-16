@@ -4,7 +4,9 @@ package se.stade.flash.dom.querying
 
     public interface DisplayListQuery
     {
-        function get selector():ElementMatcher;
-        function find(traversal:DisplayListTraversal, limit:QueryLimit = null):QueryResult;
+        function get matcher():ElementMatcher;
+        
+        function find(traversal:DisplayListTraversal,
+                      limit:QueryLimit = null):QueryResult;
     }
 }

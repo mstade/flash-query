@@ -1,7 +1,6 @@
 package se.stade.flash.dom.querying.limits
 {
     import se.stade.flash.dom.querying.QueryLimit;
-    import se.stade.flash.dom.querying.QueryResult;
     
     public final class MatchLimit implements QueryLimit
     {
@@ -17,9 +16,9 @@ package se.stade.flash.dom.querying.limits
         
         private var length:uint;
         
-        public function isReached(result:QueryResult):Boolean
+        public function isReached(matched:uint, unmatched:uint):Boolean
         {
-            return result.matches.length >= length;
+            return matched >= length;
         }
     }
 }

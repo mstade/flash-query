@@ -1,21 +1,18 @@
 package se.stade.flash.dom.querying.css.selectors.attributes
 {
-    import avmplus.getQualifiedClassName;
-    
     import flash.display.DisplayObject;
     import flash.system.ApplicationDomain;
-    import flash.utils.getDefinitionByName;
     
     import se.stade.babbla.formatting.format;
-    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     import se.stade.flash.dom.querying.css.selectors.attributes.operators.AnyAttribute;
     import se.stade.flash.dom.querying.css.selectors.attributes.operators.AttributeOperator;
-    import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
-    import se.stade.parsing.Expression;
 
-    public class AttributeSelector implements ElementMatcher, Expression
+    public class AttributeSelector implements Selector
     {
-        public function AttributeSelector(name:String, operator:AttributeOperator = null, ns:String = null)
+        public function AttributeSelector(name:String,
+                                          operator:AttributeOperator = null,
+                                          ns:String = null)
         {
             this.name = name;
             this.operator = operator || AnyAttribute.Instance;

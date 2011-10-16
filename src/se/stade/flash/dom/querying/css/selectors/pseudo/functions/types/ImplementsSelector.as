@@ -4,10 +4,10 @@ package se.stade.flash.dom.querying.css.selectors.pseudo.functions.types
     
     import se.stade.daffodil.Reflect;
     import se.stade.daffodil.Reflection;
-    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     import se.stade.flash.dom.querying.css.selectors.pseudo.functions.PseudoFunctionBase;
     
-    public class ImplementsSelector extends PseudoFunctionBase implements ElementMatcher
+    public class ImplementsSelector extends PseudoFunctionBase implements Selector
     {
         public static const Name:String = "impl";
         

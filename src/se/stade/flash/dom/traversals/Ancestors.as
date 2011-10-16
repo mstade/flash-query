@@ -2,29 +2,56 @@ package se.stade.flash.dom.traversals
 {
     import se.stade.flash.dom.DisplayNode;
     
-    public class Ancestors extends Linear implements DisplayListTraversal
+    public class Ancestors implements DisplayListTraversal
     {
-        public static function of(nodes:Vector.<DisplayNode>):Ancestors
+        public static function of(node:DisplayNode, ...nodes):DisplayListTraversal
         {
-            return new Ancestors(nodes);
+            if (nodes.length)
+            {
+                nodes = [node].concat(nodes);
+                return fromListOf(Vector.<DisplayNode>(nodes));
+            }
+            
+            return Ancestors(node);
         }
         
-        public function Ancestors(nodes:Vector.<DisplayNode>)
+        public static function fromListOf(nodes:Vector.<DisplayNode>):DisplayListTraversal
         {
-            var ancestors:Vector.<DisplayNode> = new <DisplayNode>[];
+            var traversals:Vector.<DisplayListTraversal> = new <DisplayListTraversal>[];
             
             for each (var node:DisplayNode in nodes)
             {
-                var ancestor:DisplayNode = node.parent;
-                
-                while (ancestor)
-                {
-                    ancestors.push(ancestor);
-                    ancestor = ancestor.parent;
-                }
+                traversals.push(new Ancestors(node));
             }
             
-            super(ancestors);
+            return CompositeTraversal.over(traversals);
+        }
+        
+        public function Ancestors(node:DisplayNode)
+        {
+            this.node = node;
+            reset();
+        }
+        
+        private var node:DisplayNode;
+        private var current:DisplayNode;
+        
+        public function getNext():DisplayNode
+        {
+            if (hasNext)
+                current = current.parent;
+            
+            return current;
+        }
+        
+        public function get hasNext():Boolean
+        {
+            return !!current.parent;
+        }
+        
+        public function reset():void
+        {
+            current = node;
         }
     }
 }

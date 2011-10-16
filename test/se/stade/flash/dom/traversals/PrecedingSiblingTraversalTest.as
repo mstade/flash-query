@@ -12,7 +12,7 @@ package se.stade.flash.dom.traversals
     
     public class PrecedingSiblingTraversalTest extends TraversalTest
     {       
-        private var traverser:PrecedingSiblings;
+        private var traverser:DisplayListTraversal;
         
         [Before]
         public function setUp():void
@@ -21,7 +21,7 @@ package se.stade.flash.dom.traversals
             var start1:DisplayObject = dom.getElementAt(2).getElementAt(0).getElementAt(1);
             var start2:DisplayObject = dom.getElementAt(2).getElementAt(1).getElementAt(1);
             
-            traverser = new PrecedingSiblings(DisplayNodeFactory.list(start1, start2));
+            traverser = Siblings.fromListOf(DisplayNodeFactory.list(start1, start2), SiblingDirection.Preceeding);
         }
         
         [Test]

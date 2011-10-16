@@ -1,7 +1,6 @@
 package se.stade.flash.dom.querying.limits
 {
     import se.stade.flash.dom.querying.QueryLimit;
-    import se.stade.flash.dom.querying.QueryResult;
     
     public class CombinedLimit implements QueryLimit
     {
@@ -18,11 +17,11 @@ package se.stade.flash.dom.querying.limits
         
         private var limits:Vector.<QueryLimit>
         
-        public function isReached(result:QueryResult):Boolean
+        public function isReached(matched:uint, unmatched:uint):Boolean
         {
             for each (var limit:QueryLimit in limits)
             {
-                if (limit.isReached(result))
+                if (limit.isReached(matched, unmatched))
                     return true;
             }
             

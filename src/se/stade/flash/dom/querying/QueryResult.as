@@ -4,18 +4,17 @@ package se.stade.flash.dom.querying
 
     public final class QueryResult
     {
-        public static const Empty:QueryResult = new QueryResult;
-        
-        public function QueryResult(matches:Vector.<DisplayNode> = null, unmatched:Vector.<DisplayNode> = null)
+        public function QueryResult(matched:Vector.<DisplayNode> = null,
+                                    unmatched:Vector.<DisplayNode> = null)
         {
-            _matches = matches || new Vector.<DisplayNode>;
+            _matched = matched || new Vector.<DisplayNode>;
             _unmatched = unmatched || new Vector.<DisplayNode>;
         }
         
-        private var _matches:Vector.<DisplayNode>;
-        public function get matches():Vector.<DisplayNode>
+        private var _matched:Vector.<DisplayNode>;
+        public function get matched():Vector.<DisplayNode>
         {
-            return _matches;
+            return _matched;
         }
         
         private var _unmatched:Vector.<DisplayNode>;

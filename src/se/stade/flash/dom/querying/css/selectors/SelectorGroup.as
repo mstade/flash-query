@@ -3,9 +3,8 @@ package se.stade.flash.dom.querying.css.selectors
     import flash.display.DisplayObject;
     
     import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
 
-    public class SelectorGroup implements ElementMatcher, Expression
+    public class SelectorGroup implements Selector
     {
         public static function named(name:String, selector:ElementMatcher, ...selectors):SelectorGroup
         {

@@ -4,23 +4,23 @@ package se.stade.flash.dom.querying.css.selectors.type
     
     import flash.display.DisplayObject;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.TypeMatcher;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
 
-    public class ElementTypeSelector implements ElementMatcher, Expression
+    public class ElementTypeSelector implements Selector
     {
         public function ElementTypeSelector(Type:Class)
         {
-            this.Type = Type;
+            type = new TypeMatcher(Type);
             selector = getQualifiedClassName(Type).replace("::", "|");
         }
         
-        private var Type:Class;
+        private var type:TypeMatcher;
         private var selector:String;
         
         public function matches(element:DisplayObject):Boolean
         {
-            return Type && element is Type;
+            return type.matches(element);
         }
         
         public function toString():String

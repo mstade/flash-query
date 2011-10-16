@@ -2,10 +2,9 @@ package se.stade.flash.dom.querying.css.selectors.attributes
 {
     import flash.display.DisplayObject;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
 
-    public class IdentitySelector implements ElementMatcher, Expression
+    public class IdentitySelector implements Selector
     {
         public function IdentitySelector(name:String)
         {

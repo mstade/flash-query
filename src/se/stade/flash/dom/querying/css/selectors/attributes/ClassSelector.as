@@ -3,10 +3,9 @@ package se.stade.flash.dom.querying.css.selectors.attributes
     import flash.display.DisplayObject;
     import flash.utils.Dictionary;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     
-    public class ClassSelector implements ElementMatcher, Expression
+    public class ClassSelector implements Selector
     {
         private static const StyleName:String = "styleName";
         

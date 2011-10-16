@@ -16,28 +16,40 @@ package se.stade.flash.dom.nodes
         private static const IVisualElement:Class           = define("mx.core.IVisualElement");
         private static const IVisualElementContainer:Class  = define("mx.core.IVisualElementContainer");
         
-        public static function from(element:IEventDispatcher):DisplayNode
+        private static const cache:Dictionary = new Dictionary(true);
+        
+        public static function from(element:*):DisplayNode
         {
+            if (element in cache)
+            {
+                return cache[element];
+            }
+            
+            var node:DisplayNode;
+            
             if (IVisualElementContainer && element is IVisualElementContainer)
             {
-                return new VisualElementContainerNode(element);
+                node = new VisualElementContainerNode(element);
             }
             else if (IVisualElement && element is IVisualElement)
             {
-                return new VisualElementNode(element);
+                node = new VisualElementNode(element);
             }
             else if (element is DisplayObjectContainer)
             {
-                return new DisplayObjectContainerNode(element as DisplayObjectContainer);
+                node = new DisplayObjectContainerNode(element as DisplayObjectContainer);
             }
             else if (element is DisplayObject)
             {
-                return new DisplayObjectNode(element as DisplayObject);
+                node = new DisplayObjectNode(element as DisplayObject);
             }
             else
             {
                 return null;
             }
+            
+            cache[element] = node;
+            return node;
         }
         
         public static function list(element:DisplayObject, ... elements):Vector.<DisplayNode>

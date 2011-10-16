@@ -27,7 +27,8 @@ package se.stade.flash.dom.querying.css.parsing.rules
             rules = new Dictionary;
             
             // Type
-            rules[SelectorToken.Name] = rules[SelectorToken.Namespace] = new ElementRule(ElementSelector);
+            rules[SelectorToken.Name] =
+            rules[SelectorToken.Namespace] = new ElementRule;
             
             // #id | .class | [attribute]
             rules[SelectorToken.Id]             = new IdentityRule;

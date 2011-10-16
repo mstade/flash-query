@@ -4,10 +4,10 @@ package se.stade.flash.dom.querying.css.selectors.pseudo.functions.structural
     import flash.display.DisplayObjectContainer;
     
     import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     import se.stade.flash.dom.querying.css.selectors.pseudo.functions.PseudoFunctionBase;
     
-    public class HasSelector extends PseudoFunctionBase implements ElementMatcher, Expression
+    public class HasSelector extends PseudoFunctionBase implements Selector
     {
         public static const Name:String = "has";
         

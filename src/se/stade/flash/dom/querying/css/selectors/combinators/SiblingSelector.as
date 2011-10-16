@@ -2,11 +2,15 @@ package se.stade.flash.dom.querying.css.selectors.combinators
 {
     import flash.display.DisplayObject;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     
-    public class SiblingSelector extends CombinatorMatcherBase implements CombinatorMatcher
+    public class SiblingSelector
+                 extends CombinatorMatcherBase
+                 implements CombinatorMatcher
     {
-        public function SiblingSelector(sibling:ElementMatcher, target:ElementMatcher, maxDistance:int)
+        public function SiblingSelector(sibling:Selector,
+                                        target:Selector,
+                                        maxDistance:int)
         {
             super(sibling, target, this);
             this.maxDistance = maxDistance;

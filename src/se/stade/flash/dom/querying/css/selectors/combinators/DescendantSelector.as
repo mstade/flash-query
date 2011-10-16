@@ -3,11 +3,13 @@ package se.stade.flash.dom.querying.css.selectors.combinators
     import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     
-    public class DescendantSelector extends CombinatorMatcherBase implements CombinatorMatcher
+    public class DescendantSelector
+                 extends CombinatorMatcherBase
+                 implements CombinatorMatcher
     {
-        public function DescendantSelector(ancestor:ElementMatcher, descendant:ElementMatcher)
+        public function DescendantSelector(ancestor:Selector, descendant:Selector)
         {
             super(ancestor, descendant, this);
         }

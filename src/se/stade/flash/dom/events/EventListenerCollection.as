@@ -8,15 +8,25 @@ package se.stade.flash.dom.events
         private var bubble:Dictionary = new Dictionary;
         private var capture:Dictionary = new Dictionary;
         
-        public function add(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
+        public function add(type:String,
+                            listener:Function,
+                            useCapture:Boolean=false,
+                            priority:int=0,
+                            useWeakReference:Boolean=false):void
         {
             var events:Dictionary = useCapture ? capture : bubble;
             
             events[type] ||= new Dictionary;
-            events[type][listener] = new EventListenerParameters(type, listener, useCapture, priority, useWeakReference);
+            events[type][listener] = new EventListenerParameters(type,
+                                                                 listener,
+                                                                 useCapture,
+                                                                 priority,
+                                                                 useWeakReference);
         }
 
-        public function remove(type:String, listener:Function, useCapture:Boolean=false):void
+        public function remove(type:String,
+                               listener:Function,
+                               useCapture:Boolean=false):void
         {
             var events:Dictionary = useCapture ? capture : bubble;
             
@@ -62,7 +72,7 @@ package se.stade.flash.dom.events
             return compileHandlerList(capture);
         }
         
-        public function addListener(dispatcher:IEventDispatcher):void
+        public function bind(dispatcher:IEventDispatcher):void
         {
             for each (var event:EventListenerParameters in getListeners())
             {
@@ -70,7 +80,7 @@ package se.stade.flash.dom.events
             }
         }
         
-        public function removeListener(dispatcher:IEventDispatcher):void
+        public function unbind(dispatcher:IEventDispatcher):void
         {
             for each (var event:EventListenerParameters in getListeners())
             {

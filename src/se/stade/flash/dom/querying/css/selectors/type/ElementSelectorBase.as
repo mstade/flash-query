@@ -5,9 +5,9 @@ package se.stade.flash.dom.querying.css.selectors.type
     import se.stade.babbla.formatting.format;
     import se.stade.daffodil.types.TypeReflection;
     import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
 
-    internal class ElementSelectorBase implements ElementMatcher, Expression
+    internal class ElementSelectorBase implements Selector
     {
         public function ElementSelectorBase(selector:String, type:String, namespace:ElementMatcher = null)
         {

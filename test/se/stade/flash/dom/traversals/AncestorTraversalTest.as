@@ -14,7 +14,7 @@ package se.stade.flash.dom.traversals
     
     public class AncestorTraversalTest extends TraversalTest
     {       
-        private var traverser:Ancestors;
+        private var traverser:DisplayListTraversal;
         
         [Before]
         public function setUp():void
@@ -23,7 +23,7 @@ package se.stade.flash.dom.traversals
             var start1:DisplayObject = dom.getElementAt(2).getElementAt(0).getElementAt(0);
             var start2:DisplayObject = dom.getElementAt(2).getElementAt(1).getElementAt(0);
             
-            traverser = new Ancestors(DisplayNodeFactory.list(start1, start2));
+            traverser = Ancestors.fromListOf(DisplayNodeFactory.list(start1, start2));
         }
         
         [Test]

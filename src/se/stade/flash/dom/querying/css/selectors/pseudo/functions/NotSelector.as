@@ -3,18 +3,19 @@ package se.stade.flash.dom.querying.css.selectors.pseudo.functions
     import flash.display.DisplayObject;
     
     import se.stade.flash.dom.querying.ElementMatcher;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     import se.stade.parsing.Expression;
     
-    public class NotSelector extends PseudoFunctionBase implements ElementMatcher, Expression
+    public class NotSelector extends PseudoFunctionBase implements Selector
     {
         public static const Name:String = "not";
         
-        public function NotSelector(expression:ElementMatcher)
+        public function NotSelector(expression:Selector)
         {
-            super(Name, String(expression));
+            super(Name, expression.toString());
         }
         
-        private var expression:ElementMatcher;
+        private var expression:Selector;
         
         public function matches(element:DisplayObject):Boolean
         {

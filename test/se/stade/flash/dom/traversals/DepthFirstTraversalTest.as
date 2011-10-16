@@ -17,12 +17,12 @@ package se.stade.flash.dom.traversals
     
     public class DepthFirstTraversalTest extends TraversalTest
     {
-        private var traverser:DepthFirst;
+        private var traverser:DisplayListTraversal;
         
         [Before]
         public function setUp():void
         {
-            traverser = new DepthFirst(DisplayNodeFactory.list(createDOM()));
+            traverser = Descendants.of(DisplayNodeFactory.from(createDOM()));
         }
         
         [Test]

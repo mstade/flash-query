@@ -3,11 +3,10 @@ package se.stade.flash.dom.querying.css.selectors.pseudo.functions.structural
     import flash.display.DisplayObject;
     
     import se.stade.babbla.formatting.format;
-    import se.stade.flash.dom.querying.ElementMatcher;
-    import se.stade.parsing.Expression;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     import se.stade.flash.dom.querying.css.selectors.pseudo.functions.PseudoFunctionBase;
     
-    public class NthChildSelector extends PseudoFunctionBase implements ElementMatcher, Expression
+    public class NthChildSelector extends PseudoFunctionBase implements Selector
     {
         public static const Name:String = "nth-child";
         

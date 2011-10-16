@@ -15,14 +15,15 @@ package se.stade.flash.dom.nodes
         }
         
         private var _element:DisplayObject;
-        public function get element():IEventDispatcher
+        public function get element():*
         {
             return _element;
         }
         
         public function get index():int
         {
-            return _element.parent ? _element.parent.getChildIndex(_element) : -1;
+            return _element.parent ? _element.parent.getChildIndex(_element)
+                                   : -1;
         }
         
         public function get parent():DisplayNode

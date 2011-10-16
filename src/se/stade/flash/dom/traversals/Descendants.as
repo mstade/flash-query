@@ -1,25 +1,69 @@
 package se.stade.flash.dom.traversals
 {
     import se.stade.flash.dom.DisplayNode;
+    import se.stade.flash.dom.DisplayNodeList;
+    import se.stade.flash.dom.nodes.NodeList;
     
-    public class Descendants extends DepthFirst
+    public class Descendants implements DisplayListTraversal
     {
-        public static function of(nodes:Vector.<DisplayNode>):Descendants
+        public static function of(node:DisplayNode, ... nodes):Descendants
         {
-            return new Descendants(nodes);
+            nodes = [node].concat(nodes);
+            return fromListOf(Vector.<DisplayNode>(nodes));
         }
         
-        public function Descendants(nodes:Vector.<DisplayNode>)
+        public static function fromListOf(nodes:Vector.<DisplayNode>):Descendants
         {
-            var children:Children = Children.of(nodes);
-            
-            var start:Vector.<DisplayNode> = new Vector.<DisplayNode>;
-            while (children.hasNext)
+            var list:DisplayNodeList = new NodeList(nodes);
+            return new Descendants(new LinearTraversal(list)); 
+        }
+        
+        public function Descendants(nodes:LinearTraversal)
+        {
+            start = nodes;
+            reset();
+        }
+        
+        private var start:DisplayListTraversal;
+        private var trail:Vector.<DisplayListTraversal>;
+        
+        private function get current():DisplayListTraversal
+        {
+            return trail.length ? trail[trail.length - 1] : null;
+        }
+        
+        public function get hasNext():Boolean
+        {
+            while (current)
             {
-                start.push(children.getNext());
+                if (current.hasNext)
+                    return true;
+                
+                trail.pop();
             }
             
-            super(start);
+            return false;
+        }
+        
+        public function getNext():DisplayNode
+        {
+            if (!hasNext)
+                return null;
+            
+            var next:DisplayNode = current.getNext();
+            
+            if (next)
+            {
+                trail.push(Children.of(next));
+            }
+            
+            return next;
+        }
+        
+        public function reset():void
+        {
+            start.reset();
+            trail = new <DisplayListTraversal>[start];
         }
     }
 }

@@ -3,6 +3,7 @@ package se.stade.flash.dom.querying.css.parsing.rules
     import se.stade.flash.dom.querying.css.parsing.SelectorToken;
     import se.stade.flash.dom.querying.css.selectors.type.ElementSelector;
     import se.stade.flash.dom.querying.css.selectors.type.NamespaceSelector;
+    import se.stade.flash.dom.querying.css.selectors.type.UniversalSelector;
     import se.stade.parsing.Expression;
     import se.stade.parsing.Token;
     import se.stade.parsing.TokenStream;
@@ -11,12 +12,9 @@ package se.stade.flash.dom.querying.css.parsing.rules
     
     public class ElementRule implements PrefixRule
     {
-        public function ElementRule(ElementSelectorType:Class)
+        public function ElementRule()
         {
-            this.ElementSelectorType = ElementSelectorType;
         }
-        
-        private var ElementSelectorType:Class;
         
         public function evaluate(current:Token, stream:TokenStream, parser:Parser, priority:uint):Expression
         {
@@ -25,13 +23,11 @@ package se.stade.flash.dom.querying.css.parsing.rules
                 var namespace:NamespaceSelector = new NamespaceSelector(current.value.substr(0, -1));
                 var name:Token = stream.accept(SelectorToken.Name);
                 
-                if (name)
-                    return new ElementSelector(name.value, namespace);
-                else
-                    return new ElementSelector("", namespace);
+                return new ElementSelector(name ? name.value : "", namespace);
             }
             
-            return new ElementSelectorType(current.value);
+            return current.value == "*" ? UniversalSelector.Instance
+                                        : new ElementSelector(current.value);
         }
     }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <design>
-  <namespaces>
-    <namespace prefix="stade" uri="http://stade.se/2010/flash/query"/>
-  </namespaces>
-  <categories/>
-  <components/>
+    <namespaces>
+        <namespace prefix="fquery" uri="http://stade.se/flash-query/2011"/>
+    </namespaces>
+    <categories/>
+    <components/>
 </design>

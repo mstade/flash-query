@@ -14,7 +14,7 @@ package se.stade.flash.dom.traversals
     
     public class ImmediateChildTraversalTest extends TraversalTest
     {               
-        private var traverser:Children;
+        private var traverser:DisplayListTraversal;
         
         [Before]
         public function setUp():void
@@ -23,7 +23,7 @@ package se.stade.flash.dom.traversals
             var root1:DisplayObjectContainer = dom.getElementAt(2).getElementAt(0);
             var root2:DisplayObjectContainer = dom.getElementAt(2).getElementAt(1);
             
-            traverser = new Children(DisplayNodeFactory.list(root1, root2));
+            traverser = Children.fromListOf(DisplayNodeFactory.list(root1, root2));
         }
         
         [Test]

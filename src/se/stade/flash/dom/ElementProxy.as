@@ -2,18 +2,21 @@ package se.stade.flash.dom
 {
     import flash.events.Event;
     import flash.events.IEventDispatcher;
+    import flash.events.KeyboardEvent;
+    import flash.events.MouseEvent;
+    import flash.utils.Dictionary;
     import flash.utils.Proxy;
     import flash.utils.flash_proxy;
     
+    import se.stade.flash.dom.events.EventBinder;
+    import se.stade.flash.dom.events.MultiTargetBinder;
     import se.stade.stilts.PropertySet;
     
     use namespace flash_proxy;
     
     /**
      * Proxies a list of elements, allowing interaction with multiple
-     * display objects as though they were one. While all properties
-     * and methods of each proxied element can be called, no elements
-     * can be added or removed from this list.
+     * display objects as though they were one.
      * 
      * If the common indexing syntax is used (e.g. proxy[0]) it will
      * retrieve the node at that specific syntax. Otherwise the
@@ -23,14 +26,15 @@ package se.stade.flash.dom
      * meaning any node property (like children, siblings etc.) will
      * not be proxied and must be called on each individual node.
      */
-    public dynamic class ElementProxy extends Proxy implements IEventDispatcher
+    public dynamic class ElementProxy
+                         extends Proxy
+                         implements IEventDispatcher
     {
         public static function from(node:DisplayNode, ... nodes):ElementProxy
         {
             nodes = [node].concat(nodes);
             return new ElementProxy(Vector.<DisplayNode>(nodes));
         }
-            
         
         /**
          * Wraps the given elements in a proxy instance with a given context.
@@ -40,10 +44,27 @@ package se.stade.flash.dom
          */
         public function ElementProxy(nodes:Vector.<DisplayNode> = null)
         {
-            this.nodes = nodes ? nodes.slice() : new Vector.<DisplayNode>;
+            for each (var node:DisplayNode in nodes)
+            {
+                add(node);
+            }
         }
         
-        protected var nodes:Vector.<DisplayNode>;
+        public function dispose():void
+        {
+            binder.dispose();
+            
+            _nodes = new <DisplayNode>[];
+            nodeTable = new Dictionary;
+        }
+        
+        private var nodeTable:Dictionary = new Dictionary;
+        
+        private var _nodes:Vector.<DisplayNode> = new Vector.<DisplayNode>;
+        protected function get nodes():Vector.<DisplayNode>
+        {
+            return _nodes;
+        }
         
         /**
          * @return The number of proxied elements. 
@@ -51,6 +72,43 @@ package se.stade.flash.dom
         public function get length():uint
         {
             return nodes.length;
+        }
+        
+        /**
+         * Adds one or more nodes to be proxied.
+         * 
+         * @return True if the node was added or already exists; false otherwise.
+         */
+        public function add(node:DisplayNode):Boolean
+        {
+            if (contains(node))
+                return true;
+            
+            binder.add(node.element);
+            
+            nodes.push(node);
+            nodeTable[node.element] = node;
+            return true;
+        }
+        
+        /**
+         * Removes one or more nodes from the proxy.
+         */
+        public function remove(node:DisplayNode):void
+        {
+            if (contains(node))
+            {
+                binder.remove(node.element);
+                
+                node = nodeTable[node.element];
+                nodes.splice(_nodes.indexOf(node), 1);
+                delete nodeTable[node.element];
+            }
+        }
+        
+        public function contains(node:DisplayNode):Boolean
+        {
+            return node.element in nodeTable;
         }
         
         /**
@@ -72,42 +130,143 @@ package se.stade.flash.dom
         {
             return new ElementProxy(nodes.concat(other.nodes));
         }
-            
+        
         /**
-         * Multiple events can be specified by separating the event
-         * types with a space character.
+         * If the specified property is an integer, the node at that
+         * specific index will be returned. If the specified is a string
+         * or QName, the common value of all proxied elements will be
+         * returned. If there is no common value, undefined is returned.
          * 
-         * @copy flash.display.DisplayNode#addEventListener()
-         */
-        public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int = 0, useWeakReference:Boolean=false):void
+         * Will also return undefined if an error is thrown while trying
+         * to retrieve the value of a property.
+         * 
+         * @return A node, the common value of all proxied elements or undefined.
+         */ 
+        public function get(property:*):*
         {
-            var events:Array = type.replace(/\s+/g, " ").split(" ");
+            var index:Number = parseInt(property);
             
-            for each (var event:String in events)
+            if (index == index)
+                return nodes[index];
+            
+            var value:* = undefined;
+            
+            for each (var node:DisplayNode in nodes)
             {
-                for each (var node:DisplayNode in nodes)
+                if (property in node.element)
                 {
-                    node.addEventListener(event, listener, useCapture, priority, useWeakReference);
+                    try
+                    {
+                        value ||= node.element[property];
+                        
+                        if (value === node.element[property])
+                            continue;
+                        else
+                            return undefined;
+                    }
+                    catch (error:Error)
+                    {
+                        return undefined;
+                    }
                 }
             }
         }
         
         /**
-         * Multiple events can be specified by separating the event
-         * types with a space character.
-         * 
-         * @copy flash.display.DisplayNode#removeEventListener()
-         */
-        public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void
+         * Sets all properties of a given object onto the proxies elements.
+         * If an element doesn't support setting the given property, no error
+         * is thrown and that element is ignored.
+         */ 
+        public function set(properties:Object):void
         {
-            var events:Array = type.replace(/\s+/g, " ").split(" ");
-            
-            for each (type in events)
+            for (var property:String in properties)
             {
+                var index:Number = parseInt(property);
+                
+                if (index == index)
+                    return; // We don't allow replacing elements
+                
+                var set:PropertySet = PropertySet.from(properties);
+                
                 for each (var node:DisplayNode in nodes)
                 {
-                    node.removeEventListener(type, listener, useCapture);
+                    set.applyTo(node.element);
                 }
+            }
+        }
+        
+        /**
+         * Calls the specified method on each proxied elements and returns
+         * and array with the results. If the method could not be called,
+         * the returned result for that element is an error.
+         * 
+         * @return An array of the return values from each method call.
+         */ 
+        public function call(name:*, ... parameters):Array
+        {
+            var results:Array = [];
+            
+            for each (var node:DisplayNode in nodes)
+            {
+                if (name in node.element)
+                {
+                    try
+                    {
+                        var method:Function = node.element[name] as Function;
+                        
+                        if (method != null)
+                        {
+                            results.push(method.apply(node.element, parameters));
+                        }
+                    }
+                    catch (error:Error)
+                    {
+                        results.push(error);
+                    }
+                }
+            }
+            
+            return results;
+        }
+        
+        
+        
+        private var binder:MultiTargetBinder = new MultiTargetBinder;
+        
+        public function get events():EventBinder
+        {
+            return binder;
+        }
+        
+        /**
+         * @copy flash.display.DisplayNode#addEventListener()
+         */
+        public function addEventListener(type:String,
+                                         listener:Function,
+                                         useCapture:Boolean=false,
+                                         priority:int = 0,
+                                         useWeakReference:Boolean=false):void
+        {
+            for each (var node:DisplayNode in nodes)
+            {
+                node.addEventListener(type,
+                    listener,
+                    useCapture,
+                    priority,
+                    useWeakReference);
+            }
+        }
+        
+        /**
+         * @copy flash.display.DisplayNode#removeEventListener()
+         */
+        public function removeEventListener(type:String,
+                                            listener:Function,
+                                            useCapture:Boolean=false):void
+        {
+            for each (var node:DisplayNode in nodes)
+            {
+                node.removeEventListener(type, listener, useCapture);
             }
         }
         
@@ -153,108 +312,74 @@ package se.stade.flash.dom
             return atLeastPartialSuccess;
         }
         
-        /**
-         * If the specified property is an integer, the node at that
-         * specific index will be returned. If the specified is a string
-         * or QName, the common value of all proxied elements will be
-         * returned. If there is no common value, undefined is returned.
-         * 
-         * Will also return undefined if an error is thrown while trying
-         * to retrieve the value of a property.
-         * 
-         * @return A node, the common value of all proxied elements or undefined.
-         */ 
-        public function get(property:*):*
+        /* ---------------
+        * Common mouse event bindings
+        */
+        public function onClick(handler:Function):void
         {
-            var index:int = parseInt(property);
-            
-            if (index == index)
-                return nodes[index]; // Return a specific node if property is an index
-            
-            var value:* = undefined;
-            
-            for each (var node:DisplayNode in nodes)
-            {
-                if (property in node.element)
-                {
-                    try
-                    {
-                        value ||= node.element[property];
-                        
-                        if (value === node.element[property])
-                            continue;
-                        else
-                            return undefined;
-                    }
-                    catch (error:Error)
-                    {
-                        return undefined;
-                    }
-                }
-            }
+            events.bind(MouseEvent.CLICK, handler);
         }
         
-        /**
-         * Sets all properties of a given object onto the proxies elements.
-         * If an element doesn't support setting the given property, no error
-         * is thrown and that element is ignored.
-         */ 
-        public function set(properties:Object):void
+        public function onDoubleClick(handler:Function):void
         {
-            for (var property:String in properties)
-            {
-                var index:int = parseInt(property);
-                
-                if (index == index)
-                    return; // We don't allow replacing elements
-                
-                var set:PropertySet = PropertySet.from(properties);
-                
-                for each (var node:DisplayNode in nodes)
-                {
-                    set.applyTo(node);
-                }
-            }
+            events.bind(MouseEvent.DOUBLE_CLICK, handler);
         }
         
-        /**
-         * Calls the specified method on each proxied elements and returns
-         * and array with the results. If the method could not be called,
-         * the returned result for that element is an error.
-         * 
-         * @return An array of the return values from each method call.
-         */ 
-        public function call(name:*, ... parameters):Array
+        public function onMouseDown(handler:Function):void
         {
-            var results:Array = [];
-            
-            for each (var node:DisplayNode in nodes)
-            {
-                if (name in node.element)
-                {
-                    try
-                    {
-                        var method:Function = node.element[name] as Function;
-                        
-                        if (method != null)
-                        {
-                            results.push(method.apply(node.element, parameters));
-                        }
-                    }
-                    catch (error:Error)
-                    {
-                        results.push(error);
-                    }
-                }
-            }
-            
-            return results;
+            events.bind(MouseEvent.MOUSE_DOWN, handler);
         }
         
-        // DisplayObject interface
+        public function onMouseUp(handler:Function):void
+        {
+            events.bind(MouseEvent.MOUSE_UP, handler);
+        }
+        
+        public function onMouseOver(handler:Function):void
+        {
+            events.bind(MouseEvent.MOUSE_OVER, handler);
+        }
+        
+        public function onMouseMove(handler:Function):void
+        {
+            events.bind(MouseEvent.MOUSE_MOVE, handler);
+        }
+        
+        public function onMouseOut(handler:Function):void
+        {
+            events.bind(MouseEvent.MOUSE_OUT, handler);
+        }
+        
+        public function onRollOver(handler:Function):void
+        {
+            events.bind(MouseEvent.ROLL_OVER, handler);
+        }
+        
+        public function onRollOut(handler:Function):void
+        {
+            events.bind(MouseEvent.ROLL_OUT, handler);
+        }
+        
+        /* ---------------
+        * Common key event bindings
+        */
+        public function onKeyUp(handler:Function):void
+        {
+            events.bind(KeyboardEvent.KEY_UP, handler);
+        }
+        
+        public function onKeyDown(handler:Function):void
+        {
+            events.bind(KeyboardEvent.KEY_DOWN, handler);
+        }
+        
+        /* ---------------
+         * DisplayObject interface
+         */
         /**
          * @copy flash.display.DisplayNode#alpha
-         * @return The alpha of all proxied elements if they share the same value; NaN otherwise.
+         * @return The alpha of all proxied elements if they share the same
+         *         value; NaN otherwise.
          */
         public function get alpha():Number
         {
@@ -271,7 +396,8 @@ package se.stade.flash.dom
         
         /**
          * @copy flash.display.DisplayNode#x
-         * @return The horizontal position of all proxied elements if they share the same value; NaN otherwise.
+         * @return The horizontal position of all proxied elements if they share
+         *         the same value; NaN otherwise.
          */
         public function get x():Number
         {
@@ -288,7 +414,8 @@ package se.stade.flash.dom
         
         /**
          * @copy flash.display.DisplayNode#y
-         * @return The vertical position of all proxied elements if they share the same value; NaN otherwise.
+         * @return The vertical position of all proxied elements if they share
+         *         the same value; NaN otherwise.
          */
         public function get y():Number
         {
@@ -305,7 +432,8 @@ package se.stade.flash.dom
         
         /**
          * @copy flash.display.DisplayNode#width 
-         * @return The width of all proxied elements if they share the same value; NaN otherwise.
+         * @return The width of all proxied elements if they share the same
+         *         value; NaN otherwise.
          */
         public function get width():Number
         {
@@ -322,7 +450,8 @@ package se.stade.flash.dom
         
         /**
          * @copy flash.display.DisplayNode#height
-         * @return The height of all proxied elements if they share the same value; NaN otherwise.
+         * @return The height of all proxied elements if they share the same
+         *         value; NaN otherwise.
          */
         public function get height():Number
         {
@@ -339,7 +468,8 @@ package se.stade.flash.dom
         
         /**
          * @copy flash.display.DisplayNode#visible
-         * @return A boolean if all proxied elements share the same value; undefined otherwise.
+         * @return A boolean if all proxied elements share the same value;
+         *         undefined otherwise.
          */
         public function get visible():*
         {
@@ -354,7 +484,9 @@ package se.stade.flash.dom
             set({visible: value});
         }
 
-        // Proxy interface
+        /* ---------------
+         * Proxy interface
+         */
         override flash_proxy function hasProperty(name:*):Boolean
         {
             var index:int = parseInt(name);
@@ -380,7 +512,10 @@ package se.stade.flash.dom
         
         override flash_proxy function setProperty(name:*, value:*):void
         {
-            set({name: value});
+            var prop:Object = {};
+            prop[name] = value;
+            
+            set(prop);
         }
         
         override flash_proxy function callProperty(name:*, ... rest):*

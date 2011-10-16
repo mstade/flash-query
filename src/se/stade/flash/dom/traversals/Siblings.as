@@ -4,39 +4,54 @@ package se.stade.flash.dom.traversals
     
     public class Siblings implements DisplayListTraversal
     {
-        public static function of(nodes:Vector.<DisplayNode>):Siblings
+        public static function of(direction:uint, node:DisplayNode, ... nodes):DisplayListTraversal
         {
-            return new Siblings(nodes);
+            if (nodes.length)
+            {
+                nodes = [node].concat(nodes);
+                return fromListOf(Vector.<DisplayNode>(nodes), direction);
+            }
+            
+            return new Siblings(node, direction); 
         }
         
-        public function Siblings(nodes:Vector.<DisplayNode>)
+        public static function fromListOf(nodes:Vector.<DisplayNode>, direction:uint):DisplayListTraversal
         {
-            precedingSiblings = new PrecedingSiblings(nodes);
-            followingSiblings = new FollowingSiblings(nodes);
+            var siblings:Vector.<DisplayListTraversal> = new <DisplayListTraversal>[];
+            
+            for each (var node:DisplayNode in nodes)
+            {
+                siblings.push(new Siblings(node, direction));
+            }
+            
+            return CompositeTraversal.over(siblings);
         }
         
-        protected var precedingSiblings:PrecedingSiblings;
-        protected var followingSiblings:FollowingSiblings;
+        public function Siblings(node:DisplayNode, direction:uint)
+        {
+            if (direction == SiblingDirection.Following)
+                traverser = LinearTraversal.over(node.nextSiblings);
+            else if (direction == SiblingDirection.Preceeding)
+                traverser = LinearTraversal.over(node.prevSiblings);
+            else
+                traverser = LinearTraversal.over(node.prevSiblings, node.nextSiblings);
+        }
+        
+        private var traverser:DisplayListTraversal;
         
         public function getNext():DisplayNode
         {
-            if (precedingSiblings.hasNext)
-                return precedingSiblings.getNext();
-            else if (followingSiblings.hasNext)
-                return followingSiblings.getNext();
-            
-            return undefined;
+            return traverser.getNext();
         }
-
+        
         public function get hasNext():Boolean
         {
-            return precedingSiblings.hasNext || followingSiblings.hasNext;
+            return traverser.hasNext;
         }
-
+        
         public function reset():void
         {
-            precedingSiblings.reset();
-            followingSiblings.reset();
+            traverser.reset();
         }
     }
 }

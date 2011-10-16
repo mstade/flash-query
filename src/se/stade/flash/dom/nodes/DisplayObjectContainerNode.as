@@ -16,14 +16,15 @@ package se.stade.flash.dom.nodes
         }
         
         private var _element:DisplayObjectContainer;
-        public function get element():IEventDispatcher
+        public function get element():*
         {
             return _element;
         }
         
         public function get index():int
         {
-            return _element.parent ? _element.parent.getChildIndex(_element) : -1;
+            return _element.parent ? _element.parent.getChildIndex(_element)
+                                   : -1;
         }
         
         public function get parent():DisplayNode
@@ -58,9 +59,17 @@ package se.stade.flash.dom.nodes
             return DisplayNodeFactory.from(child);
         }
         
-        public function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+        public function addEventListener(type:String,
+                                         listener:Function,
+                                         useCapture:Boolean = false,
+                                         priority:int = 0,
+                                         useWeakReference:Boolean = false):void
         {
-            element.addEventListener(type, listener, useCapture, priority, useWeakReference);
+            element.addEventListener(type,
+                                     listener,
+                                     useCapture,
+                                     priority,
+                                     useWeakReference);
         }
         
         public function dispatchEvent(event:Event):Boolean
@@ -68,7 +77,9 @@ package se.stade.flash.dom.nodes
             return element.dispatchEvent(event);
         }
         
-        public function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void
+        public function removeEventListener(type:String,
+                                            listener:Function,
+                                            useCapture:Boolean = false):void
         {
             element.removeEventListener(type, listener, useCapture);
         }

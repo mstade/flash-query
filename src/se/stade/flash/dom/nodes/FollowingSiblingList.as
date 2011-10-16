@@ -19,13 +19,13 @@ package se.stade.flash.dom.nodes
         
         public function get length():uint
         {
-            return reference.parent.children.length - reference.index;
+            return children.length - reference.index - 1;
         }
         
         public function itemAt(index:int):DisplayNode
         {
-            if (index > -1 && index < length - 1)
-                return children.itemAt(length - index - 1);
+            if (0 <= index && index < length)
+                return children.itemAt(reference.index + 1 + index);
             else
                 return null;
         }
@@ -39,7 +39,7 @@ package se.stade.flash.dom.nodes
         {
             var index:int = children.indexOf(node);
             
-            if (index > -1 && index < length)
+            if (0 <= index && index < length)
                 return index - length + 1;
             else
                 return -1;
@@ -52,8 +52,8 @@ package se.stade.flash.dom.nodes
         
         public function insert(node:DisplayNode, index:int):DisplayNode
         {
-            if (index > -1 && index < length)
-                return children.insert(node, length - index - 1);
+            if (0 <= index && index < length)
+                return children.insert(node, reference.index + 1 + index);
             
             return null;
         }

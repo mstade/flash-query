@@ -2,8 +2,8 @@ package se.stade.flash.dom.querying.css.parsing.rules
 {
     import flash.utils.Dictionary;
     
-    import se.stade.flash.dom.querying.ElementMatcher;
     import se.stade.flash.dom.querying.css.parsing.SelectorToken;
+    import se.stade.flash.dom.querying.css.selectors.Selector;
     import se.stade.flash.dom.querying.css.selectors.SelectorGroup;
     import se.stade.flash.dom.querying.css.selectors.combinators.ChildSelector;
     import se.stade.flash.dom.querying.css.selectors.combinators.DescendantSelector;
@@ -28,10 +28,14 @@ package se.stade.flash.dom.querying.css.parsing.rules
         
         private var factories:Dictionary;
         
-        public function evaluate(preceding:Expression, current:Token, following:TokenStream, parser:Parser, precedence:uint):Expression
+        public function evaluate(preceding:Expression,
+                                 current:Token,
+                                 following:TokenStream,
+                                 parser:Parser,
+                                 precedence:uint):Expression
         {
-            var left:ElementMatcher = ElementMatcher(preceding);
-            var right:ElementMatcher = ElementMatcher(parser.interpret(following, precedence - 1));
+            var left:Selector = Selector(preceding);
+            var right:Selector = Selector(parser.interpret(following, precedence - 1));
             
             if (current.type == SelectorToken.Sibling)
             {
