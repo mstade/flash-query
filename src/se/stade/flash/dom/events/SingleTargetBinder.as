@@ -6,7 +6,7 @@ package se.stade.flash.dom.events
     
     import se.stade.stilts.Disposable;
 
-    public class SingleTargetBinder implements EventBinder
+    public class SingleTargetBinder implements EventBinder, Disposable
     {
         /**
          * Creates an EventBinder used to bind events to the specifed target.
@@ -86,9 +86,11 @@ package se.stade.flash.dom.events
                     event.stopPropagation();
                 };
                 
-                type = stripNamespace(type);
-                target.addEventListener(type, events[type][handler],
-                                        capture, priority, weak);
+                target.addEventListener(stripNamespace(type),
+                                        events[type][handler],
+                                        capture,
+                                        priority,
+                                        weak);
             }
         }
         
